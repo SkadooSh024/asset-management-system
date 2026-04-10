@@ -1,0 +1,23 @@
+body {
+  background: linear-gradient(135deg, #e9f2ff, #f8fbff);
+}
+
+.login-page {
+  min-height: 100vh;
+  padding: 16px;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 430px;
+  border-radius: 18px;
+}
+
+.form-control {
+  height: 48px;
+  border-radius: 10px;
+}
+
+.btn-primary {
+  border-radius: 10px;
+}
