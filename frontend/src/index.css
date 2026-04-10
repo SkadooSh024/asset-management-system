@@ -1,15 +1,18 @@
 body {
-  background: linear-gradient(135deg, #e9f2ff, #f8fbff);
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  background: linear-gradient(135deg, #eaf2ff, #f8fbff);
+}
+
+#root {
+  min-height: 100vh;
 }
 
 .login-page {
   min-height: 100vh;
-  padding: 16px;
 }
 
 .login-card {
-  width: 100%;
-  max-width: 430px;
   border-radius: 18px;
 }
 

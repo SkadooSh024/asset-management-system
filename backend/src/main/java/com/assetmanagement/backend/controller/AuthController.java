@@ -16,7 +16,6 @@ import com.assetmanagement.backend.repository.UserRepository;
 
 @RestController
 @RequestMapping("/api/auth")
-@CrossOrigin(origins = {"http://localhost:5173"})
 public class AuthController {
 
     private final UserRepository userRepository;
