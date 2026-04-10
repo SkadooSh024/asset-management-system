@@ -1,10 +1,13 @@
 import { useState } from "react";
+import axiosClient from "../../api/axiosClient";
 
 function Login() {
   const [formData, setFormData] = useState({
     username: "",
     password: "",
   });
+
+  const [message, setMessage] = useState("");
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -14,60 +17,60 @@ function Login() {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    alert(
-      `Đăng nhập thử:\nTên đăng nhập: ${formData.username}\nMật khẩu: ${formData.password}`
-    );
+    setMessage("");
+
+    try {
+      const response = await axiosClient.post("/api/auth/login", formData);
+      if (response.data.success) {
+        setMessage(`Xin chào ${response.data.user.fullName}`);
+      } else {
+        setMessage(response.data.message);
+      }
+    } catch (error) {
+      setMessage("Không kết nối được server");
+      console.error(error);
+    }
   };
 
   return (
-    <div className="login-page d-flex align-items-center justify-content-center">
-      <div className="card shadow-lg border-0 login-card">
-        <div className="card-body p-4 p-md-5">
-          <div className="text-center mb-4">
-            <h2 className="fw-bold text-primary mb-2">Đăng nhập</h2>
-            <p className="text-muted mb-0">Hệ thống quản lý tài sản</p>
+    <div className="container-fluid min-vh-100 d-flex align-items-center justify-content-center bg-light">
+      <div className="card shadow p-4" style={{ width: "100%", maxWidth: "420px" }}>
+        <h2 className="text-center mb-3 text-primary">Đăng nhập</h2>
+        <p className="text-center text-muted">Hệ thống quản lý tài sản</p>
+
+        <form onSubmit={handleSubmit}>
+          <div className="mb-3">
+            <label className="form-label">Tên đăng nhập</label>
+            <input
+              type="text"
+              className="form-control"
+              name="username"
+              value={formData.username}
+              onChange={handleChange}
+              placeholder="Nhập username"
+            />
           </div>
 
-          <form onSubmit={handleSubmit}>
-            <div className="mb-3">
-              <label htmlFor="username" className="form-label fw-semibold">
-                Tên đăng nhập
-              </label>
-              <input
-                type="text"
-                className="form-control"
-                id="username"
-                name="username"
-                placeholder="Nhập tên đăng nhập"
-                value={formData.username}
-                onChange={handleChange}
-              />
-            </div>
+          <div className="mb-3">
+            <label className="form-label">Mật khẩu</label>
+            <input
+              type="password"
+              className="form-control"
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
+              placeholder="Nhập password"
+            />
+          </div>
 
-            <div className="mb-3">
-              <label htmlFor="password" className="form-label fw-semibold">
-                Mật khẩu
-              </label>
-              <input
-                type="password"
-                className="form-control"
-                id="password"
-                name="password"
-                placeholder="Nhập mật khẩu"
-                value={formData.password}
-                onChange={handleChange}
-              />
-            </div>
+          <button type="submit" className="btn btn-primary w-100">
+            Đăng nhập
+          </button>
 
-            <div className="d-grid mt-4">
-              <button type="submit" className="btn btn-primary btn-lg">
-                Đăng nhập
-              </button>
-            </div>
-          </form>
-        </div>
+          {message && <div className="alert alert-info mt-3 mb-0">{message}</div>}
+        </form>
       </div>
     </div>
   );
