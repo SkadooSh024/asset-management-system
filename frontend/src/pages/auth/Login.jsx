@@ -121,30 +121,7 @@ function Login() {
                   </div>
                 )}
 
-                {userInfo && (
-                  <div className="card mt-3 border-success">
-                    <div className="card-body">
-                      <h6 className="fw-bold text-success mb-3">
-                        Thông tin người dùng
-                      </h6>
-                      <p className="mb-1">
-                        <strong>User ID:</strong> {userInfo.userId}
-                      </p>
-                      <p className="mb-1">
-                        <strong>Username:</strong> {userInfo.username}
-                      </p>
-                      <p className="mb-1">
-                        <strong>Họ tên:</strong> {userInfo.fullName}
-                      </p>
-                      <p className="mb-1">
-                        <strong>Email:</strong> {userInfo.email}
-                      </p>
-                      <p className="mb-0">
-                        <strong>Trạng thái:</strong> {userInfo.status}
-                      </p>
-                    </div>
-                  </div>
-                )}
+            
 
             
               </div>
