@@ -1,15 +1,17 @@
 import { useState } from "react";
 import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import axiosClient from "../../api/axiosClient";
+import { useToast } from "../common/ToastProvider";
 import { clearStoredUser, getStoredUser, hasAnyRole } from "../../utils/auth";
+import { MODULE_ACCESS } from "../../config/roleAccess";
 
 const MENU_ITEMS = [
-  { to: "/dashboard", label: "Tổng quan", roles: ["ADMIN", "ASSET_STAFF", "MANAGER", "END_USER"] },
-  { to: "/catalog", label: "Danh mục", roles: ["ADMIN", "ASSET_STAFF"] },
-  { to: "/assets", label: "Tài sản", roles: ["ADMIN", "ASSET_STAFF", "MANAGER"] },
-  { to: "/assignments", label: "Cấp phát", roles: ["ADMIN", "ASSET_STAFF", "MANAGER"] },
-  { to: "/incidents", label: "Báo hỏng", roles: ["ADMIN", "ASSET_STAFF", "MANAGER", "END_USER"] },
-  { to: "/maintenance", label: "Bảo trì", roles: ["ADMIN", "ASSET_STAFF", "MANAGER"] },
+  { to: "/dashboard", label: "Tổng quan", roles: MODULE_ACCESS.DASHBOARD },
+  { to: "/catalog", label: "Danh mục", roles: MODULE_ACCESS.CATALOG },
+  { to: "/assets", label: "Tài sản", roles: MODULE_ACCESS.ASSET },
+  { to: "/assignments", label: "Cấp phát", roles: MODULE_ACCESS.ASSIGNMENT },
+  { to: "/incidents", label: "Báo hỏng", roles: MODULE_ACCESS.INCIDENT },
+  { to: "/maintenance", label: "Bảo trì", roles: MODULE_ACCESS.MAINTENANCE },
 ];
 
 const PAGE_TITLES = {
@@ -26,6 +28,7 @@ function AppShell() {
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const user = getStoredUser();
+  const toast = useToast();
 
   const visibleItems = MENU_ITEMS.filter((item) => hasAnyRole(user, item.roles));
 
@@ -38,6 +41,7 @@ function AppShell() {
       // Frontend đang dùng local session; logout vẫn được thực hiện ở client ngay cả khi API lỗi.
     } finally {
       clearStoredUser();
+      toast.info("Đã đăng xuất khỏi hệ thống.");
       navigate("/login", { replace: true });
     }
   };

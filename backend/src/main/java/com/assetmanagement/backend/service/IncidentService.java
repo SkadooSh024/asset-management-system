@@ -65,7 +65,11 @@ public class IncidentService {
     public IncidentResponse createIncident(IncidentReportRequest request) {
         IncidentReport incident = new IncidentReport();
         Asset asset = referenceDataService.requireAsset(request.getAssetId());
-        User reportedBy = referenceDataService.requireUser(request.getReportedByUserId());
+        User reportedBy = referenceDataService.requireUserWithRoles(
+            request.getReportedByUserId(),
+            SystemCodes.ROLE_ASSET_STAFF,
+            SystemCodes.ROLE_END_USER
+        );
         User assignedTo = referenceDataService.getUserOrNull(request.getAssignedToUserId());
         AssetStatus waitingMaintenance = referenceDataService.requireAssetStatusByCode(SystemCodes.ASSET_STATUS_WAITING_MAINTENANCE);
 
@@ -106,7 +110,11 @@ public class IncidentService {
     @Transactional
     public IncidentResponse assignIncident(Long incidentId, IncidentAssignmentRequest request) {
         IncidentReport incident = referenceDataService.requireIncident(incidentId);
-        referenceDataService.requireUser(request.getActingUserId());
+        referenceDataService.requireUserWithRoles(
+            request.getActingUserId(),
+            SystemCodes.ROLE_ASSET_STAFF,
+            SystemCodes.ROLE_MANAGER
+        );
         if (
             !SystemCodes.INCIDENT_STATUS_OPEN.equals(incident.getStatus())
                 && !SystemCodes.INCIDENT_STATUS_IN_REVIEW.equals(incident.getStatus())
@@ -127,7 +135,11 @@ public class IncidentService {
     @Transactional
     public IncidentResponse closeIncident(Long incidentId, IncidentCloseRequest request) {
         IncidentReport incident = referenceDataService.requireIncident(incidentId);
-        User actingUser = referenceDataService.requireUser(request.getActingUserId());
+        User actingUser = referenceDataService.requireUserWithRoles(
+            request.getActingUserId(),
+            SystemCodes.ROLE_ASSET_STAFF,
+            SystemCodes.ROLE_MANAGER
+        );
         if (SystemCodes.INCIDENT_STATUS_CONVERTED.equals(incident.getStatus())) {
             throw new BusinessException(HttpStatus.BAD_REQUEST, "Sự cố đã được chuyển sang bảo trì, không thể đóng trực tiếp.");
         }
@@ -174,7 +186,11 @@ public class IncidentService {
     @Transactional
     public IncidentResponse convertIncidentToMaintenance(Long incidentId, IncidentConvertRequest request) {
         IncidentReport incident = referenceDataService.requireIncident(incidentId);
-        User actingUser = referenceDataService.requireUser(request.getActingUserId());
+        User actingUser = referenceDataService.requireUserWithRoles(
+            request.getActingUserId(),
+            SystemCodes.ROLE_ASSET_STAFF,
+            SystemCodes.ROLE_MANAGER
+        );
         if (
             !SystemCodes.INCIDENT_STATUS_OPEN.equals(incident.getStatus())
                 && !SystemCodes.INCIDENT_STATUS_IN_REVIEW.equals(incident.getStatus())

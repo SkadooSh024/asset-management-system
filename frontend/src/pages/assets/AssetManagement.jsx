@@ -2,8 +2,10 @@ import { useEffect, useState } from "react";
 import axiosClient from "../../api/axiosClient";
 import PageHeader from "../../components/common/PageHeader";
 import StatusBadge from "../../components/common/StatusBadge";
-import { getStoredUser } from "../../utils/auth";
+import useFeedbackToast from "../../hooks/useFeedbackToast";
+import { getStoredUser, hasAnyRole } from "../../utils/auth";
 import { formatCurrency, formatDate, formatDateTime, getApiErrorMessage } from "../../utils/format";
+import { ACTION_ACCESS } from "../../config/roleAccess";
 
 const EMPTY_ASSET_FORM = {
   assetCode: "",
@@ -51,7 +53,9 @@ function AssetManagement() {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
 
-  const canManage = ["ADMIN", "ASSET_STAFF"].includes(user?.roleCode);
+  useFeedbackToast({ successMessage: message, errorMessage: error });
+
+  const canManage = hasAnyRole(user, ACTION_ACCESS.ASSET_MANAGE);
 
   const fetchAssets = async () => {
     setLoading(true);

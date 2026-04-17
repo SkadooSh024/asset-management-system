@@ -2,8 +2,10 @@ import { useEffect, useState } from "react";
 import axiosClient from "../../api/axiosClient";
 import PageHeader from "../../components/common/PageHeader";
 import StatusBadge from "../../components/common/StatusBadge";
+import useFeedbackToast from "../../hooks/useFeedbackToast";
 import { getStoredUser, hasAnyRole } from "../../utils/auth";
 import { formatCurrency, formatDateTime, getApiErrorMessage } from "../../utils/format";
+import { ACTION_ACCESS } from "../../config/roleAccess";
 
 const PRIORITY_LABELS = {
   LOW: "Thấp",
@@ -59,7 +61,9 @@ function MaintenanceManagement() {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
 
-  const canManage = hasAnyRole(user, ["ADMIN", "ASSET_STAFF"]);
+  useFeedbackToast({ successMessage: message, errorMessage: error });
+
+  const canManage = hasAnyRole(user, ACTION_ACCESS.MAINTENANCE_MANAGE);
 
   const fetchData = async () => {
     setLoading(true);

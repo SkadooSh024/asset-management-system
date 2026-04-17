@@ -1,10 +1,14 @@
 package com.assetmanagement.backend.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 public class AssetCategoryRequest {
 
     private Long parentCategoryId;
+
+        @NotNull(message = "Người thao tác không được để trống.")
+        private Long actingUserId;
 
         @NotBlank(message = "Mã danh mục không được để trống.")
         private String categoryCode;
@@ -26,6 +30,14 @@ public class AssetCategoryRequest {
 
     public void setParentCategoryId(Long parentCategoryId) {
             this.parentCategoryId = parentCategoryId;
+        }
+
+    public Long getActingUserId() {
+            return actingUserId;
+        }
+
+    public void setActingUserId(Long actingUserId) {
+            this.actingUserId = actingUserId;
         }
 
     public String getCategoryCode() {

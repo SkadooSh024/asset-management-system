@@ -1,5 +1,6 @@
 package com.assetmanagement.backend.service;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
@@ -84,6 +85,28 @@ public class ReferenceDataService {
     public User requireUser(Long userId) {
         return userRepository.findById(userId)
             .orElseThrow(() -> new BusinessException(HttpStatus.NOT_FOUND, "Không tìm thấy người dùng."));
+    }
+
+    public User requireUserWithRoles(Long userId, String... allowedRoleCodes) {
+        User user = requireUser(userId);
+
+        if (!SystemCodes.USER_STATUS_ACTIVE.equalsIgnoreCase(user.getStatus())) {
+            throw new BusinessException(HttpStatus.FORBIDDEN, "Tài khoản này hiện không hoạt động.");
+        }
+
+        if (allowedRoleCodes == null || allowedRoleCodes.length == 0) {
+            return user;
+        }
+
+        String currentRoleCode = user.getRole() != null ? user.getRole().getRoleCode() : null;
+        boolean isAllowed = Arrays.stream(allowedRoleCodes)
+            .anyMatch(roleCode -> roleCode.equalsIgnoreCase(currentRoleCode));
+
+        if (!isAllowed) {
+            throw new BusinessException(HttpStatus.FORBIDDEN, "Bạn không có quyền thực hiện thao tác này.");
+        }
+
+        return user;
     }
 
     public User getUserOrNull(Long userId) {

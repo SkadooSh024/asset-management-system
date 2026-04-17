@@ -57,7 +57,11 @@ public class AssetService {
     public AssetResponse createAsset(AssetRequest request) {
         validateAssetCode(request.getAssetCode(), null);
 
-        User actingUser = referenceDataService.requireUser(request.getActingUserId());
+        User actingUser = referenceDataService.requireUserWithRoles(
+            request.getActingUserId(),
+            SystemCodes.ROLE_ADMIN,
+            SystemCodes.ROLE_ASSET_STAFF
+        );
         Asset asset = new Asset();
         applyAssetRequest(asset, request, actingUser, true);
         Asset savedAsset = assetRepository.save(asset);
@@ -85,7 +89,11 @@ public class AssetService {
         Asset asset = referenceDataService.requireAsset(assetId);
         validateAssetCode(request.getAssetCode(), assetId);
 
-        User actingUser = referenceDataService.requireUser(request.getActingUserId());
+        User actingUser = referenceDataService.requireUserWithRoles(
+            request.getActingUserId(),
+            SystemCodes.ROLE_ADMIN,
+            SystemCodes.ROLE_ASSET_STAFF
+        );
         AssetStatus oldStatus = asset.getCurrentStatus();
         Department oldDepartment = asset.getCurrentDepartment();
         User oldAssignedUser = asset.getAssignedUser();
@@ -114,7 +122,11 @@ public class AssetService {
     @Transactional
     public AssetResponse retireAsset(Long assetId, AssignmentActionRequest request) {
         Asset asset = referenceDataService.requireAsset(assetId);
-        User actingUser = referenceDataService.requireUser(request.getActingUserId());
+        User actingUser = referenceDataService.requireUserWithRoles(
+            request.getActingUserId(),
+            SystemCodes.ROLE_ADMIN,
+            SystemCodes.ROLE_ASSET_STAFF
+        );
         AssetStatus retiredStatus = referenceDataService.requireAssetStatusByCode(SystemCodes.ASSET_STATUS_RETIRED);
 
         AssetStatus oldStatus = asset.getCurrentStatus();

@@ -15,6 +15,7 @@ import com.assetmanagement.backend.dto.AssetCategoryRequest;
 import com.assetmanagement.backend.dto.AssetCategoryResponse;
 import com.assetmanagement.backend.dto.AssetStatusRequest;
 import com.assetmanagement.backend.dto.AssetStatusResponse;
+import com.assetmanagement.backend.dto.AssignmentActionRequest;
 import com.assetmanagement.backend.service.CatalogService;
 
 import jakarta.validation.Valid;
@@ -45,8 +46,11 @@ public class CatalogController {
     }
 
     @PatchMapping("/categories/{categoryId}/deactivate")
-    public AssetCategoryResponse deactivateCategory(@PathVariable Long categoryId) {
-        return catalogService.deactivateCategory(categoryId);
+    public AssetCategoryResponse deactivateCategory(
+        @PathVariable Long categoryId,
+        @Valid @RequestBody AssignmentActionRequest request
+    ) {
+        return catalogService.deactivateCategory(categoryId, request);
     }
 
     @GetMapping("/statuses")

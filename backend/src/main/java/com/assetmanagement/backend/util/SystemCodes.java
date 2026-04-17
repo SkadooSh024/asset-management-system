@@ -3,6 +3,10 @@ package com.assetmanagement.backend.util;
 public final class SystemCodes {
 
     public static final String USER_STATUS_ACTIVE = "ACTIVE";
+    public static final String ROLE_ADMIN = "ADMIN";
+    public static final String ROLE_ASSET_STAFF = "ASSET_STAFF";
+    public static final String ROLE_MANAGER = "MANAGER";
+    public static final String ROLE_END_USER = "END_USER";
 
     public static final String ASSET_STATUS_READY = "READY";
     public static final String ASSET_STATUS_IN_USE = "IN_USE";

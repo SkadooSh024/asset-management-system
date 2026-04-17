@@ -2,8 +2,10 @@ import { useEffect, useState } from "react";
 import axiosClient from "../../api/axiosClient";
 import PageHeader from "../../components/common/PageHeader";
 import StatusBadge from "../../components/common/StatusBadge";
-import { getStoredUser } from "../../utils/auth";
+import useFeedbackToast from "../../hooks/useFeedbackToast";
+import { getStoredUser, hasAnyRole } from "../../utils/auth";
 import { getApiErrorMessage } from "../../utils/format";
+import { ACTION_ACCESS } from "../../config/roleAccess";
 
 const EMPTY_CATEGORY_FORM = {
   categoryCode: "",
@@ -44,7 +46,9 @@ function CatalogManagement() {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
 
-  const canManage = ["ADMIN", "ASSET_STAFF"].includes(user?.roleCode);
+  useFeedbackToast({ successMessage: message, errorMessage: error });
+
+  const canManage = hasAnyRole(user, ACTION_ACCESS.CATALOG_MANAGE);
 
   const fetchCatalog = async () => {
     setLoading(true);
@@ -97,6 +101,7 @@ function CatalogManagement() {
           parentCategoryId: categoryForm.parentCategoryId || null,
           defaultWarrantyMonths: categoryForm.defaultWarrantyMonths || null,
           defaultMaintenanceCycleDays: categoryForm.defaultMaintenanceCycleDays || null,
+          actingUserId: user.userId,
         });
         setMessage("Cập nhật danh mục tài sản thành công.");
       } else {
@@ -105,6 +110,7 @@ function CatalogManagement() {
           parentCategoryId: categoryForm.parentCategoryId || null,
           defaultWarrantyMonths: categoryForm.defaultWarrantyMonths || null,
           defaultMaintenanceCycleDays: categoryForm.defaultMaintenanceCycleDays || null,
+          actingUserId: user.userId,
         });
         setMessage("Thêm danh mục tài sản thành công.");
       }
@@ -124,10 +130,16 @@ function CatalogManagement() {
 
     try {
       if (editingStatusId) {
-        await axiosClient.put(`/api/catalog/statuses/${editingStatusId}`, statusForm);
+        await axiosClient.put(`/api/catalog/statuses/${editingStatusId}`, {
+          ...statusForm,
+          actingUserId: user.userId,
+        });
         setMessage("Cập nhật trạng thái tài sản thành công.");
       } else {
-        await axiosClient.post("/api/catalog/statuses", statusForm);
+        await axiosClient.post("/api/catalog/statuses", {
+          ...statusForm,
+          actingUserId: user.userId,
+        });
         setMessage("Thêm trạng thái tài sản thành công.");
       }
 
@@ -169,7 +181,9 @@ function CatalogManagement() {
     setError("");
 
     try {
-      await axiosClient.patch(`/api/catalog/categories/${categoryId}/deactivate`);
+      await axiosClient.patch(`/api/catalog/categories/${categoryId}/deactivate`, {
+        actingUserId: user.userId,
+      });
       setMessage("Đã ngừng sử dụng danh mục.");
       fetchCatalog();
     } catch (requestError) {
@@ -264,7 +278,7 @@ function CatalogManagement() {
                 disabled={!canManage}
               />
             </div>
-
+                  
             <div className="form-check inline-check">
               <input
                 id="category-active"
@@ -275,10 +289,12 @@ function CatalogManagement() {
                 onChange={handleCategoryChange}
                 disabled={!canManage}
               />
+              
               <label htmlFor="category-active" className="form-check-label">
                 Đang hoạt động
               </label>
             </div>
+            <div></div>
 
             <div className="form-grid form-grid--full">
               <label className="form-label">Mô tả</label>

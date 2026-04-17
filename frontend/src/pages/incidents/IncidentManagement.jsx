@@ -2,8 +2,10 @@ import { useEffect, useState } from "react";
 import axiosClient from "../../api/axiosClient";
 import PageHeader from "../../components/common/PageHeader";
 import StatusBadge from "../../components/common/StatusBadge";
+import useFeedbackToast from "../../hooks/useFeedbackToast";
 import { getStoredUser, hasAnyRole } from "../../utils/auth";
 import { formatDateTime, getApiErrorMessage } from "../../utils/format";
+import { ACTION_ACCESS } from "../../config/roleAccess";
 
 const SEVERITY_LABELS = {
   LOW: "Thấp",
@@ -40,7 +42,10 @@ function IncidentManagement() {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
 
-  const canHandle = hasAnyRole(user, ["ADMIN", "ASSET_STAFF", "MANAGER"]);
+  useFeedbackToast({ successMessage: message, errorMessage: error });
+
+  const canReport = hasAnyRole(user, ACTION_ACCESS.INCIDENT_REPORT);
+  const canHandle = hasAnyRole(user, ACTION_ACCESS.INCIDENT_HANDLE);
 
   const fetchData = async () => {
     setLoading(true);
@@ -219,6 +224,7 @@ function IncidentManagement() {
                 value={createForm.assetId}
                 onChange={handleCreateChange}
                 required
+                disabled={!canReport}
               >
                 <option value="">Chọn tài sản</option>
                 {assets.map((asset) => (
@@ -236,6 +242,7 @@ function IncidentManagement() {
                 name="severity"
                 value={createForm.severity}
                 onChange={handleCreateChange}
+                disabled={!canReport}
               >
                 <option value="LOW">Thấp</option>
                 <option value="MEDIUM">Trung bình</option>
@@ -253,6 +260,7 @@ function IncidentManagement() {
                 value={createForm.issueTitle}
                 onChange={handleCreateChange}
                 required
+                disabled={!canReport}
               />
             </div>
 
@@ -265,14 +273,17 @@ function IncidentManagement() {
                 value={createForm.issueDescription}
                 onChange={handleCreateChange}
                 required
+                disabled={!canReport}
               />
             </div>
 
-            <div className="form-actions">
-              <button type="submit" className="btn btn-primary">
-                Gửi báo hỏng hoặc sự cố
-              </button>
-            </div>
+            {canReport ? (
+              <div className="form-actions">
+                <button type="submit" className="btn btn-primary">
+                  Gửi báo hỏng hoặc sự cố
+                </button>
+              </div>
+            ) : null}
           </form>
         </section>
 

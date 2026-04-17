@@ -2,8 +2,10 @@ import { useEffect, useState } from "react";
 import axiosClient from "../../api/axiosClient";
 import PageHeader from "../../components/common/PageHeader";
 import StatusBadge from "../../components/common/StatusBadge";
+import useFeedbackToast from "../../hooks/useFeedbackToast";
 import { getStoredUser, hasAnyRole } from "../../utils/auth";
 import { formatDate, getApiErrorMessage } from "../../utils/format";
+import { ACTION_ACCESS } from "../../config/roleAccess";
 
 function AssignmentManagement() {
   const user = getStoredUser();
@@ -24,9 +26,11 @@ function AssignmentManagement() {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
 
-  const canCreate = hasAnyRole(user, ["ADMIN", "ASSET_STAFF"]);
-  const canApprove = hasAnyRole(user, ["ADMIN", "MANAGER"]);
-  const canComplete = hasAnyRole(user, ["ADMIN", "ASSET_STAFF"]);
+  useFeedbackToast({ successMessage: message, errorMessage: error });
+
+  const canCreate = hasAnyRole(user, ACTION_ACCESS.ASSIGNMENT_CREATE);
+  const canApprove = hasAnyRole(user, ACTION_ACCESS.ASSIGNMENT_APPROVE);
+  const canComplete = hasAnyRole(user, ACTION_ACCESS.ASSIGNMENT_COMPLETE);
 
   const fetchData = async () => {
     setLoading(true);

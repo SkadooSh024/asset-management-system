@@ -1,8 +1,12 @@
 package com.assetmanagement.backend.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 public class AssetStatusRequest {
+
+    @NotNull(message = "Người thao tác không được để trống.")
+        private Long actingUserId;
 
     @NotBlank(message = "Mã trạng thái không được để trống.")
         private String statusCode;
@@ -18,6 +22,14 @@ public class AssetStatusRequest {
         private Integer sortOrder;
 
         private String description;
+
+    public Long getActingUserId() {
+            return actingUserId;
+        }
+
+    public void setActingUserId(Long actingUserId) {
+            this.actingUserId = actingUserId;
+        }
 
     public String getStatusCode() {
             return statusCode;

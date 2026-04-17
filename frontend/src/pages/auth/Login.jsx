@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { Navigate, useLocation, useNavigate } from "react-router-dom";
 import axiosClient from "../../api/axiosClient";
+import { useToast } from "../../components/common/ToastProvider";
+import useFeedbackToast from "../../hooks/useFeedbackToast";
 import { setStoredUser, getStoredUser } from "../../utils/auth";
 import { getApiErrorMessage } from "../../utils/format";
 
@@ -13,9 +15,12 @@ function Login() {
   const navigate = useNavigate();
   const location = useLocation();
   const storedUser = getStoredUser();
+  const toast = useToast();
   const [formData, setFormData] = useState(INITIAL_FORM);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  useFeedbackToast({ errorMessage: error });
 
   if (storedUser) {
     return <Navigate to="/dashboard" replace />;
@@ -37,6 +42,7 @@ function Login() {
     try {
       const { data } = await axiosClient.post("/api/auth/login", formData);
       setStoredUser(data.user);
+      toast.success("Đăng nhập thành công.");
       navigate(location.state?.from || "/dashboard", { replace: true });
     } catch (requestError) {
       setError(getApiErrorMessage(requestError, "Đăng nhập thất bại."));
@@ -49,23 +55,19 @@ function Login() {
     <div className="login-screen">
       <div className="login-screen__content">
         <div className="login-intro">
-          <span className="login-tag">Thực tập tốt nghiệp</span>
           <h1>Hệ thống quản lý tài sản, cấp phát và bảo trì thiết bị</h1>
-          <p>
-            Đăng nhập để thao tác trên 6 module lõi: danh mục, tài sản, cấp phát,
-            báo hỏng, bảo trì và tổng quan hệ thống.
-          </p>
+          
           <div className="login-highlights">
             <div>
-              <strong>Track</strong>
+              <strong>Quản lý</strong>
               <span>Vòng đời tài sản</span>
             </div>
             <div>
-              <strong>Operate</strong>
+              <strong>Vận hành</strong>
               <span>Nghiệp vụ rõ ràng</span>
             </div>
             <div>
-              <strong>Audit</strong>
+              <strong>Kiểm tra</strong>
               <span>Lịch sử và truy vết</span>
             </div>
           </div>
@@ -74,7 +76,6 @@ function Login() {
         <div className="login-card">
           <div className="login-card__header">
             <h2>Đăng nhập hệ thống</h2>
-            <p>Sử dụng tài khoản demo trong dữ liệu mẫu để thao tác.</p>
           </div>
 
           <form onSubmit={handleSubmit} className="login-form">
@@ -119,8 +120,7 @@ function Login() {
 
           <div className="login-note">
             <small>
-              Gợi ý demo: `admin / admin123`, `asset_admin / manager123`,
-              `training_user / staff123`
+              Demo: admin / admin123, asset_admin / manager123, training_user / staff123, lab_manager / staff123
             </small>
           </div>
         </div>

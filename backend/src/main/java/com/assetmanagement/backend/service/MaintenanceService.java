@@ -68,7 +68,11 @@ public class MaintenanceService {
 
     @Transactional
     public MaintenanceTicketResponse createTicket(MaintenanceTicketRequest request) {
-        User actingUser = referenceDataService.requireUser(request.getActingUserId());
+        User actingUser = referenceDataService.requireUserWithRoles(
+            request.getActingUserId(),
+            SystemCodes.ROLE_ASSET_STAFF,
+            SystemCodes.ROLE_MANAGER
+        );
         Asset asset = referenceDataService.requireAsset(request.getAssetId());
         IncidentReport incident = request.getIncidentReportId() == null
             ? null
@@ -126,7 +130,11 @@ public class MaintenanceService {
     @Transactional
     public MaintenanceTicketResponse addUpdate(Long ticketId, MaintenanceUpdateRequest request) {
         MaintenanceTicket ticket = requireTicket(ticketId);
-        User actingUser = referenceDataService.requireUser(request.getActingUserId());
+        User actingUser = referenceDataService.requireUserWithRoles(
+            request.getActingUserId(),
+            SystemCodes.ROLE_ASSET_STAFF,
+            SystemCodes.ROLE_MANAGER
+        );
 
         MaintenanceUpdate update = new MaintenanceUpdate();
         update.setMaintenanceTicket(ticket);
@@ -154,7 +162,11 @@ public class MaintenanceService {
     @Transactional
     public MaintenanceTicketResponse completeTicket(Long ticketId, MaintenanceCompleteRequest request) {
         MaintenanceTicket ticket = requireTicket(ticketId);
-        User actingUser = referenceDataService.requireUser(request.getActingUserId());
+        User actingUser = referenceDataService.requireUserWithRoles(
+            request.getActingUserId(),
+            SystemCodes.ROLE_ASSET_STAFF,
+            SystemCodes.ROLE_MANAGER
+        );
         Asset asset = ticket.getAsset();
 
         AssetStatus targetStatus = request.getTargetStatusId() != null

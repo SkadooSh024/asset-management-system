@@ -11,12 +11,14 @@ import com.assetmanagement.backend.dto.AssetCategoryRequest;
 import com.assetmanagement.backend.dto.AssetCategoryResponse;
 import com.assetmanagement.backend.dto.AssetStatusRequest;
 import com.assetmanagement.backend.dto.AssetStatusResponse;
+import com.assetmanagement.backend.dto.AssignmentActionRequest;
 import com.assetmanagement.backend.entity.AssetCategory;
 import com.assetmanagement.backend.entity.AssetStatus;
 import com.assetmanagement.backend.exception.BusinessException;
 import com.assetmanagement.backend.repository.AssetCategoryRepository;
 import com.assetmanagement.backend.repository.AssetStatusRepository;
 import com.assetmanagement.backend.util.ResponseMapper;
+import com.assetmanagement.backend.util.SystemCodes;
 
 @Service
 public class CatalogService {
@@ -45,6 +47,7 @@ public class CatalogService {
 
     @Transactional
     public AssetCategoryResponse createCategory(AssetCategoryRequest request) {
+        referenceDataService.requireUserWithRoles(request.getActingUserId(), SystemCodes.ROLE_ADMIN);
         validateCategoryCode(request.getCategoryCode(), null);
 
         AssetCategory category = new AssetCategory();
@@ -54,6 +57,7 @@ public class CatalogService {
 
     @Transactional
     public AssetCategoryResponse updateCategory(Long categoryId, AssetCategoryRequest request) {
+        referenceDataService.requireUserWithRoles(request.getActingUserId(), SystemCodes.ROLE_ADMIN);
         AssetCategory category = referenceDataService.requireCategory(categoryId);
         validateCategoryCode(request.getCategoryCode(), categoryId);
 
@@ -62,7 +66,8 @@ public class CatalogService {
     }
 
     @Transactional
-    public AssetCategoryResponse deactivateCategory(Long categoryId) {
+    public AssetCategoryResponse deactivateCategory(Long categoryId, AssignmentActionRequest request) {
+        referenceDataService.requireUserWithRoles(request.getActingUserId(), SystemCodes.ROLE_ADMIN);
         AssetCategory category = referenceDataService.requireCategory(categoryId);
         category.setIsActive(Boolean.FALSE);
         return ResponseMapper.toAssetCategoryResponse(assetCategoryRepository.save(category));
@@ -78,6 +83,7 @@ public class CatalogService {
 
     @Transactional
     public AssetStatusResponse createStatus(AssetStatusRequest request) {
+        referenceDataService.requireUserWithRoles(request.getActingUserId(), SystemCodes.ROLE_ADMIN);
         validateStatusCode(request.getStatusCode(), null);
 
         AssetStatus status = new AssetStatus();
@@ -87,6 +93,7 @@ public class CatalogService {
 
     @Transactional
     public AssetStatusResponse updateStatus(Long statusId, AssetStatusRequest request) {
+        referenceDataService.requireUserWithRoles(request.getActingUserId(), SystemCodes.ROLE_ADMIN);
         AssetStatus status = referenceDataService.requireAssetStatus(statusId);
         validateStatusCode(request.getStatusCode(), statusId);
 

@@ -60,7 +60,10 @@ public class AssignmentService {
 
     @Transactional
     public AssignmentResponse createAssignment(AssignmentCreateRequest request) {
-        User actingUser = referenceDataService.requireUser(request.getActingUserId());
+        User actingUser = referenceDataService.requireUserWithRoles(
+            request.getActingUserId(),
+            SystemCodes.ROLE_ASSET_STAFF
+        );
         Department targetDepartment = referenceDataService.getDepartmentOrNull(request.getTargetDepartmentId());
         User targetUser = referenceDataService.getUserOrNull(request.getTargetUserId());
         if (targetDepartment == null && targetUser == null) {
@@ -112,7 +115,10 @@ public class AssignmentService {
             throw new BusinessException(HttpStatus.BAD_REQUEST, "Chỉ phiếu đang ở trạng thái nháp mới có thể phê duyệt.");
         }
 
-        User actingUser = referenceDataService.requireUser(request.getActingUserId());
+        User actingUser = referenceDataService.requireUserWithRoles(
+            request.getActingUserId(),
+            SystemCodes.ROLE_MANAGER
+        );
         form.setStatus(SystemCodes.ASSIGNMENT_STATUS_CONFIRMED);
         form.setApprovedByUser(actingUser);
         form.setUpdatedBy(actingUser);
@@ -130,7 +136,10 @@ public class AssignmentService {
             throw new BusinessException(HttpStatus.BAD_REQUEST, "Chỉ phiếu đã được phê duyệt mới có thể hoàn tất.");
         }
 
-        User actingUser = referenceDataService.requireUser(request.getActingUserId());
+        User actingUser = referenceDataService.requireUserWithRoles(
+            request.getActingUserId(),
+            SystemCodes.ROLE_ASSET_STAFF
+        );
         AssetStatus inUseStatus = referenceDataService.requireAssetStatusByCode(SystemCodes.ASSET_STATUS_IN_USE);
         Department destinationDepartment = form.getTargetDepartment() != null
             ? form.getTargetDepartment()

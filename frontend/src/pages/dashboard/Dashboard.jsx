@@ -3,6 +3,7 @@ import axiosClient from "../../api/axiosClient";
 import PageHeader from "../../components/common/PageHeader";
 import StatCard from "../../components/common/StatCard";
 import StatusBadge from "../../components/common/StatusBadge";
+import useFeedbackToast from "../../hooks/useFeedbackToast";
 import { formatDate, formatDateTime, getApiErrorMessage } from "../../utils/format";
 
 const PRIORITY_LABELS = {
@@ -16,6 +17,8 @@ function Dashboard() {
   const [summary, setSummary] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+
+  useFeedbackToast({ errorMessage: error });
 
   useEffect(() => {
     const fetchSummary = async () => {
