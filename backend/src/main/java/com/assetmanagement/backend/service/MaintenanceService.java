@@ -75,7 +75,7 @@ public class MaintenanceService {
             : referenceDataService.requireIncident(request.getIncidentReportId());
 
         if (incident != null && maintenanceTicketRepository.existsByIncidentReport_IncidentReportId(incident.getIncidentReportId())) {
-            throw new BusinessException(HttpStatus.CONFLICT, "Bao hong nay da co phieu bao tri.");
+            throw new BusinessException(HttpStatus.CONFLICT, "Báo hỏng này đã có phiếu bảo trì.");
         }
 
         MaintenanceTicket ticket = new MaintenanceTicket();
@@ -117,7 +117,7 @@ public class MaintenanceService {
             asset.getAssignedUser(),
             asset.getAssignedUser(),
             actingUser,
-            "Mo phieu bao tri tai san."
+            "Mở phiếu bảo trì tài sản."
         );
 
         return ResponseMapper.toMaintenanceTicketResponse(savedTicket);
@@ -194,7 +194,7 @@ public class MaintenanceService {
             asset.getAssignedUser(),
             asset.getAssignedUser(),
             actingUser,
-            "Hoan tat bao tri tai san."
+            "Hoàn tất bảo trì tài sản."
         );
 
         return ResponseMapper.toMaintenanceTicketResponse(ticket);
@@ -209,6 +209,6 @@ public class MaintenanceService {
 
     private MaintenanceTicket requireTicket(Long ticketId) {
         return maintenanceTicketRepository.findById(ticketId)
-            .orElseThrow(() -> new BusinessException(HttpStatus.NOT_FOUND, "Khong tim thay phieu bao tri."));
+            .orElseThrow(() -> new BusinessException(HttpStatus.NOT_FOUND, "Không tìm thấy phiếu bảo trì."));
     }
 }

@@ -26,6 +26,17 @@ const EMPTY_ASSET_FORM = {
   isActive: true,
 };
 
+const HISTORY_ACTION_LABELS = {
+  CREATE: "Khởi tạo",
+  UPDATE: "Cập nhật",
+  RETIRE: "Thanh lý",
+  ASSIGNMENT: "Cấp phát",
+  INCIDENT: "Ghi nhận sự cố",
+  INCIDENT_CLOSE: "Đóng sự cố",
+  MAINTENANCE: "Mở phiếu bảo trì",
+  MAINTENANCE_COMPLETE: "Hoàn tất bảo trì",
+};
+
 function AssetManagement() {
   const user = getStoredUser();
   const [assets, setAssets] = useState([]);
@@ -55,7 +66,7 @@ function AssetManagement() {
       setAssets(assetsResponse.data);
       setLookups(lookupsResponse.data);
     } catch (requestError) {
-      setError(getApiErrorMessage(requestError, "Khong tai duoc danh sach tai san."));
+      setError(getApiErrorMessage(requestError, "Không tải được danh sách tài sản."));
     } finally {
       setLoading(false);
     }
@@ -78,7 +89,7 @@ function AssetManagement() {
       const { data } = await axiosClient.get(`/api/assets/${assetId}`);
       setSelectedAsset(data);
     } catch (requestError) {
-      setError(getApiErrorMessage(requestError, "Khong tai duoc chi tiet tai san."));
+      setError(getApiErrorMessage(requestError, "Không tải được chi tiết tài sản."));
     }
   };
 
@@ -131,16 +142,16 @@ function AssetManagement() {
     try {
       if (editingAssetId) {
         await axiosClient.put(`/api/assets/${editingAssetId}`, payload);
-        setMessage("Cap nhat tai san thanh cong.");
+        setMessage("Cập nhật tài sản thành công.");
       } else {
         await axiosClient.post("/api/assets", payload);
-        setMessage("Them tai san thanh cong.");
+        setMessage("Thêm tài sản thành công.");
       }
 
       resetForm();
       fetchAssets();
     } catch (requestError) {
-      setError(getApiErrorMessage(requestError, "Khong luu duoc tai san."));
+      setError(getApiErrorMessage(requestError, "Không lưu được tài sản."));
     }
   };
 
@@ -151,15 +162,15 @@ function AssetManagement() {
     try {
       await axiosClient.patch(`/api/assets/${assetId}/retire`, {
         actingUserId: user.userId,
-        note: "Danh dau thanh ly tai san tu giao dien quan ly.",
+        note: "Đánh dấu thanh lý tài sản từ giao diện quản lý.",
       });
-      setMessage("Da danh dau thanh ly tai san.");
+      setMessage("Đã đánh dấu thanh lý tài sản.");
       fetchAssets();
       if (selectedAsset?.assetId === assetId) {
         setSelectedAsset(null);
       }
     } catch (requestError) {
-      setError(getApiErrorMessage(requestError, "Khong the thanh ly tai san."));
+      setError(getApiErrorMessage(requestError, "Không thể thanh lý tài sản."));
     }
   };
 
@@ -177,12 +188,12 @@ function AssetManagement() {
   return (
     <div className="page-stack">
       <PageHeader
-        title="Quan ly tai san"
-        description="Quan ly ho so tai san, thong tin su dung hien tai va lich su bien dong."
+        title="Quản lý tài sản"
+        description="Quản lý hồ sơ tài sản, thông tin sử dụng hiện tại và lịch sử biến động."
         action={
           canManage ? (
             <button type="button" className="btn btn-primary" onClick={resetForm}>
-              Them tai san moi
+              Thêm tài sản mới
             </button>
           ) : null
         }
@@ -196,7 +207,7 @@ function AssetManagement() {
           <input
             type="text"
             className="form-control"
-            placeholder="Tim theo ma, ten hoac brand..."
+            placeholder="Tìm theo mã, tên hoặc hãng..."
             value={keyword}
             onChange={(event) => setKeyword(event.target.value)}
           />
@@ -205,7 +216,7 @@ function AssetManagement() {
             value={categoryFilter}
             onChange={(event) => setCategoryFilter(event.target.value)}
           >
-            <option value="">Tat ca danh muc</option>
+            <option value="">Tất cả danh mục</option>
             {lookups?.assetCategories?.map((category) => (
               <option key={category.id} value={category.id}>
                 {category.name}
@@ -217,7 +228,7 @@ function AssetManagement() {
             value={statusFilter}
             onChange={(event) => setStatusFilter(event.target.value)}
           >
-            <option value="">Tat ca trang thai</option>
+            <option value="">Tất cả trạng thái</option>
             {lookups?.assetStatuses?.map((status) => (
               <option key={status.id} value={status.id}>
                 {status.name}
@@ -230,19 +241,19 @@ function AssetManagement() {
       <div className="content-grid">
         <section className="content-card content-card--wide">
           <div className="card-head">
-            <h3>Danh sach tai san</h3>
-            <p>Chon 1 tai san de xem chi tiet va lich su.</p>
+            <h3>Danh sách tài sản</h3>
+            <p>Chọn 1 tài sản để xem chi tiết và lịch sử.</p>
           </div>
           <div className="table-responsive">
             <table className="table align-middle custom-table">
               <thead>
                 <tr>
-                  <th>Ma tai san</th>
-                  <th>Ten tai san</th>
-                  <th>Danh muc</th>
-                  <th>Trang thai</th>
-                  <th>Phong ban</th>
-                  {canManage ? <th className="text-end">Tac vu</th> : null}
+                  <th>Mã tài sản</th>
+                  <th>Tên tài sản</th>
+                  <th>Danh mục</th>
+                  <th>Trạng thái</th>
+                  <th>Phòng ban</th>
+                  {canManage ? <th className="text-end">Tác vụ</th> : null}
                 </tr>
               </thead>
               <tbody>
@@ -268,7 +279,7 @@ function AssetManagement() {
                                 handleEditAsset(asset);
                               }}
                             >
-                              Sua
+                              Sửa
                             </button>
                             <button
                               type="button"
@@ -278,7 +289,7 @@ function AssetManagement() {
                                 handleRetireAsset(asset.assetId);
                               }}
                             >
-                              Thanh ly
+                              Thanh lý
                             </button>
                           </div>
                         </td>
@@ -288,7 +299,7 @@ function AssetManagement() {
                 ) : (
                   <tr>
                     <td colSpan={canManage ? 6 : 5} className="text-center text-muted">
-                      {loading ? "Dang tai..." : "Khong co tai san phu hop bo loc."}
+                      {loading ? "Đang tải..." : "Không có tài sản phù hợp bộ lọc."}
                     </td>
                   </tr>
                 )}
@@ -299,13 +310,13 @@ function AssetManagement() {
 
         <section className="content-card">
           <div className="card-head">
-            <h3>{editingAssetId ? "Cap nhat tai san" : "Them tai san"}</h3>
-            <p>{canManage ? "Luu y: ma tai san phai duy nhat." : "Tai khoan nay chi co quyen xem."}</p>
+            <h3>{editingAssetId ? "Cập nhật tài sản" : "Thêm tài sản"}</h3>
+            <p>{canManage ? "Lưu ý: mã tài sản phải duy nhất." : "Tài khoản này chỉ có quyền xem."}</p>
           </div>
 
           <form className="form-grid" onSubmit={handleSubmit}>
             <div>
-              <label className="form-label">Ma tai san</label>
+              <label className="form-label">Mã tài sản</label>
               <input
                 type="text"
                 className="form-control"
@@ -318,7 +329,7 @@ function AssetManagement() {
             </div>
 
             <div>
-              <label className="form-label">Ten tai san</label>
+              <label className="form-label">Tên tài sản</label>
               <input
                 type="text"
                 className="form-control"
@@ -331,7 +342,7 @@ function AssetManagement() {
             </div>
 
             <div>
-              <label className="form-label">Danh muc</label>
+              <label className="form-label">Danh mục</label>
               <select
                 className="form-select"
                 name="categoryId"
@@ -340,7 +351,7 @@ function AssetManagement() {
                 required
                 disabled={!canManage}
               >
-                <option value="">Chon danh muc</option>
+                <option value="">Chọn danh mục</option>
                 {lookups?.assetCategories?.map((category) => (
                   <option key={category.id} value={category.id}>
                     {category.name}
@@ -350,7 +361,7 @@ function AssetManagement() {
             </div>
 
             <div>
-              <label className="form-label">Trang thai</label>
+              <label className="form-label">Trạng thái</label>
               <select
                 className="form-select"
                 name="currentStatusId"
@@ -358,7 +369,7 @@ function AssetManagement() {
                 onChange={handleInputChange}
                 disabled={!canManage}
               >
-                <option value="">Mac dinh theo nghiep vu</option>
+                <option value="">Mặc định theo nghiệp vụ</option>
                 {lookups?.assetStatuses?.map((status) => (
                   <option key={status.id} value={status.id}>
                     {status.name}
@@ -368,7 +379,7 @@ function AssetManagement() {
             </div>
 
             <div>
-              <label className="form-label">Phong ban so huu</label>
+              <label className="form-label">Phòng ban sở hữu</label>
               <select
                 className="form-select"
                 name="owningDepartmentId"
@@ -376,7 +387,7 @@ function AssetManagement() {
                 onChange={handleInputChange}
                 disabled={!canManage}
               >
-                <option value="">Chon phong ban</option>
+                <option value="">Chọn phòng ban</option>
                 {lookups?.departments?.map((department) => (
                   <option key={department.id} value={department.id}>
                     {department.name}
@@ -386,7 +397,7 @@ function AssetManagement() {
             </div>
 
             <div>
-              <label className="form-label">Phong ban hien tai</label>
+              <label className="form-label">Phòng ban hiện tại</label>
               <select
                 className="form-select"
                 name="currentDepartmentId"
@@ -394,7 +405,7 @@ function AssetManagement() {
                 onChange={handleInputChange}
                 disabled={!canManage}
               >
-                <option value="">Chon phong ban</option>
+                <option value="">Chọn phòng ban</option>
                 {lookups?.departments?.map((department) => (
                   <option key={department.id} value={department.id}>
                     {department.name}
@@ -404,7 +415,7 @@ function AssetManagement() {
             </div>
 
             <div>
-              <label className="form-label">Nguoi su dung hien tai</label>
+              <label className="form-label">Người sử dụng hiện tại</label>
               <select
                 className="form-select"
                 name="assignedUserId"
@@ -412,7 +423,7 @@ function AssetManagement() {
                 onChange={handleInputChange}
                 disabled={!canManage}
               >
-                <option value="">Chon nguoi dung</option>
+                <option value="">Chọn người dùng</option>
                 {lookups?.users?.map((item) => (
                   <option key={item.id} value={item.id}>
                     {item.fullName}
@@ -422,37 +433,37 @@ function AssetManagement() {
             </div>
 
             <div>
-              <label className="form-label">Brand</label>
+              <label className="form-label">Hãng</label>
               <input type="text" className="form-control" name="brand" value={assetForm.brand} onChange={handleInputChange} disabled={!canManage} />
             </div>
 
             <div>
-              <label className="form-label">Model</label>
+              <label className="form-label">Dòng máy</label>
               <input type="text" className="form-control" name="model" value={assetForm.model} onChange={handleInputChange} disabled={!canManage} />
             </div>
 
             <div>
-              <label className="form-label">Serial number</label>
+              <label className="form-label">Số serial</label>
               <input type="text" className="form-control" name="serialNumber" value={assetForm.serialNumber} onChange={handleInputChange} disabled={!canManage} />
             </div>
 
             <div>
-              <label className="form-label">Asset tag</label>
+              <label className="form-label">Mã thẻ tài sản</label>
               <input type="text" className="form-control" name="assetTag" value={assetForm.assetTag} onChange={handleInputChange} disabled={!canManage} />
             </div>
 
             <div>
-              <label className="form-label">Ngay mua</label>
+              <label className="form-label">Ngày mua</label>
               <input type="date" className="form-control" name="purchaseDate" value={assetForm.purchaseDate} onChange={handleInputChange} disabled={!canManage} />
             </div>
 
             <div>
-              <label className="form-label">Het bao hanh</label>
+              <label className="form-label">Ngày hết bảo hành</label>
               <input type="date" className="form-control" name="warrantyExpiryDate" value={assetForm.warrantyExpiryDate} onChange={handleInputChange} disabled={!canManage} />
             </div>
 
             <div>
-              <label className="form-label">Gia mua</label>
+              <label className="form-label">Giá mua</label>
               <input type="number" className="form-control" name="purchaseCost" value={assetForm.purchaseCost} onChange={handleInputChange} disabled={!canManage} />
             </div>
 
@@ -467,27 +478,27 @@ function AssetManagement() {
                 disabled={!canManage}
               />
               <label htmlFor="asset-active" className="form-check-label">
-                Dang hoat dong
+                Đang hoạt động
               </label>
             </div>
 
             <div className="form-grid form-grid--full">
-              <label className="form-label">Thong so ky thuat</label>
+              <label className="form-label">Thông số kỹ thuật</label>
               <textarea className="form-control" rows="3" name="specificationText" value={assetForm.specificationText} onChange={handleInputChange} disabled={!canManage} />
             </div>
 
             <div className="form-grid form-grid--full">
-              <label className="form-label">Ghi chu</label>
+              <label className="form-label">Ghi chú</label>
               <textarea className="form-control" rows="3" name="notes" value={assetForm.notes} onChange={handleInputChange} disabled={!canManage} />
             </div>
 
             {canManage ? (
               <div className="form-actions">
                 <button type="submit" className="btn btn-primary">
-                  {editingAssetId ? "Cap nhat tai san" : "Luu tai san"}
+                  {editingAssetId ? "Cập nhật tài sản" : "Lưu tài sản"}
                 </button>
                 <button type="button" className="btn btn-outline-secondary" onClick={resetForm}>
-                  Dat lai
+                  Đặt lại
                 </button>
               </div>
             ) : null}
@@ -496,35 +507,35 @@ function AssetManagement() {
 
         <section className="content-card content-card--full">
           <div className="card-head">
-            <h3>Chi tiet va lich su</h3>
-            <p>Chon 1 tai san trong bang de xem nhat ky bien dong.</p>
+            <h3>Chi tiết và lịch sử</h3>
+            <p>Chọn 1 tài sản trong bảng để xem nhật ký biến động.</p>
           </div>
 
           {selectedAsset ? (
             <div className="detail-stack">
               <div className="detail-grid">
                 <div>
-                  <span className="detail-label">Ten tai san</span>
+                  <span className="detail-label">Tên tài sản</span>
                   <strong>{selectedAsset.assetName}</strong>
                 </div>
                 <div>
-                  <span className="detail-label">Ma tai san</span>
+                  <span className="detail-label">Mã tài sản</span>
                   <strong>{selectedAsset.assetCode}</strong>
                 </div>
                 <div>
-                  <span className="detail-label">Trang thai</span>
+                  <span className="detail-label">Trạng thái</span>
                   <StatusBadge status={selectedAsset.currentStatus?.code} />
                 </div>
                 <div>
-                  <span className="detail-label">Gia mua</span>
+                  <span className="detail-label">Giá mua</span>
                   <strong>{formatCurrency(selectedAsset.purchaseCost)}</strong>
                 </div>
                 <div>
-                  <span className="detail-label">Ngay mua</span>
+                  <span className="detail-label">Ngày mua</span>
                   <strong>{formatDate(selectedAsset.purchaseDate)}</strong>
                 </div>
                 <div>
-                  <span className="detail-label">Cap nhat luc</span>
+                  <span className="detail-label">Cập nhật lúc</span>
                   <strong>{formatDateTime(selectedAsset.updatedAt)}</strong>
                 </div>
               </div>
@@ -533,11 +544,11 @@ function AssetManagement() {
                 <table className="table align-middle custom-table">
                   <thead>
                     <tr>
-                      <th>Thoi gian</th>
-                      <th>Hanh dong</th>
-                      <th>Tu</th>
-                      <th>Den</th>
-                      <th>Mo ta</th>
+                      <th>Thời gian</th>
+                      <th>Hành động</th>
+                      <th>Từ</th>
+                      <th>Đến</th>
+                      <th>Mô tả</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -545,7 +556,7 @@ function AssetManagement() {
                       selectedAsset.histories.map((history) => (
                         <tr key={history.assetHistoryId}>
                           <td>{formatDateTime(history.actionTime)}</td>
-                          <td>{history.actionType}</td>
+                          <td>{HISTORY_ACTION_LABELS[history.actionType] || history.actionType}</td>
                           <td>{history.fromStatus?.name || history.fromDepartment?.name || history.fromUser?.fullName || "--"}</td>
                           <td>{history.toStatus?.name || history.toDepartment?.name || history.toUser?.fullName || "--"}</td>
                           <td>{history.description || "--"}</td>
@@ -554,7 +565,7 @@ function AssetManagement() {
                     ) : (
                       <tr>
                         <td colSpan="5" className="text-center text-muted">
-                          Chua co lich su bien dong.
+                          Chưa có lịch sử biến động.
                         </td>
                       </tr>
                     )}
@@ -564,7 +575,7 @@ function AssetManagement() {
             </div>
           ) : (
             <div className="empty-panel">
-              Chon 1 tai san trong danh sach de xem thong tin chi tiet va lich su.
+              Chọn 1 tài sản trong danh sách để xem thông tin chi tiết và lịch sử.
             </div>
           )}
         </section>

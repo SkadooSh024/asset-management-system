@@ -8,12 +8,12 @@ import jakarta.validation.constraints.NotNull;
 
 public class MaintenanceUpdateRequest {
 
-    @NotNull(message = "Nguoi thao tac khong duoc de trong.")
+    @NotNull(message = "Người thao tác không được để trống.")
         private Long actingUserId;
 
         private String updateStatus;
 
-        @NotBlank(message = "Noi dung cap nhat khong duoc de trong.")
+        @NotBlank(message = "Nội dung cập nhật không được để trống.")
         private String updateNote;
 
         private LocalDate nextActionDate;

@@ -6,7 +6,7 @@ import jakarta.validation.constraints.NotNull;
 
 public class AssignmentItemRequest {
 
-    @NotNull(message = "Tai san trong phieu cap phat khong duoc de trong.")
+    @NotNull(message = "Tài sản trong phiếu cấp phát không được để trống.")
         private Long assetId;
 
         private LocalDate expectedReturnDate;

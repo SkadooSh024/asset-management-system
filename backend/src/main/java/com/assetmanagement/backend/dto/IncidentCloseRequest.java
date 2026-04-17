@@ -5,10 +5,10 @@ import jakarta.validation.constraints.NotNull;
 
 public class IncidentCloseRequest {
 
-    @NotNull(message = "Nguoi thao tac khong duoc de trong.")
+    @NotNull(message = "Người thao tác không được để trống.")
         private Long actingUserId;
 
-        @NotBlank(message = "Trang thai dong su co khong duoc de trong.")
+        @NotBlank(message = "Trạng thái đóng sự cố không được để trống.")
         private String status;
 
         private String resolutionNote;

@@ -4,13 +4,13 @@ import jakarta.validation.constraints.NotBlank;
 
 public class AssetStatusRequest {
 
-    @NotBlank(message = "Ma trang thai khong duoc de trong.")
+    @NotBlank(message = "Mã trạng thái không được để trống.")
         private String statusCode;
 
-        @NotBlank(message = "Ten trang thai khong duoc de trong.")
+        @NotBlank(message = "Tên trạng thái không được để trống.")
         private String statusName;
 
-        @NotBlank(message = "Nhom trang thai khong duoc de trong.")
+        @NotBlank(message = "Nhóm trạng thái không được để trống.")
         private String statusGroup;
 
         private Boolean isAllocatable;

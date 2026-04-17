@@ -5,21 +5,21 @@ import jakarta.validation.constraints.NotNull;
 
 public class IncidentReportRequest {
 
-    @NotNull(message = "Tai san khong duoc de trong.")
+    @NotNull(message = "Tài sản không được để trống.")
         private Long assetId;
 
-        @NotNull(message = "Nguoi bao hong khong duoc de trong.")
+        @NotNull(message = "Người báo hỏng không được để trống.")
         private Long reportedByUserId;
 
         private Long assignedToUserId;
 
-        @NotBlank(message = "Muc do uu tien khong duoc de trong.")
+        @NotBlank(message = "Mức độ sự cố không được để trống.")
         private String severity;
 
-        @NotBlank(message = "Tieu de su co khong duoc de trong.")
+        @NotBlank(message = "Tiêu đề sự cố không được để trống.")
         private String issueTitle;
 
-        @NotBlank(message = "Mo ta su co khong duoc de trong.")
+        @NotBlank(message = "Mô tả sự cố không được để trống.")
         private String issueDescription;
 
     public Long getAssetId() {

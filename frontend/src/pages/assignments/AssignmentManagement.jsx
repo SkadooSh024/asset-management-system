@@ -43,7 +43,7 @@ function AssignmentManagement() {
       setAssets(assetsResponse.data);
       setLookups(lookupsResponse.data);
     } catch (requestError) {
-      setError(getApiErrorMessage(requestError, "Khong tai duoc du lieu cap phat."));
+      setError(getApiErrorMessage(requestError, "Không tải được dữ liệu cấp phát."));
     } finally {
       setLoading(false);
     }
@@ -93,7 +93,7 @@ function AssignmentManagement() {
         })),
       });
 
-      setMessage("Tao phieu cap phat thanh cong.");
+      setMessage("Tạo phiếu cấp phát thành công.");
       setForm({
         assignmentDate: new Date().toISOString().slice(0, 10),
         sourceDepartmentId: "",
@@ -105,7 +105,7 @@ function AssignmentManagement() {
       });
       fetchData();
     } catch (requestError) {
-      setError(getApiErrorMessage(requestError, "Khong tao duoc phieu cap phat."));
+      setError(getApiErrorMessage(requestError, "Không tạo được phiếu cấp phát."));
     }
   };
 
@@ -117,14 +117,14 @@ function AssignmentManagement() {
       await axiosClient.patch(`/api/assignments/${assignmentId}/${action}`, {
         actingUserId: user.userId,
       });
-      setMessage(action === "approve" ? "Phe duyet thanh cong." : "Hoan tat cap phat thanh cong.");
+      setMessage(action === "approve" ? "Phê duyệt thành công." : "Hoàn tất cấp phát thành công.");
       fetchData();
       if (selectedAssignment?.assignmentFormId === assignmentId) {
         const { data } = await axiosClient.get(`/api/assignments/${assignmentId}`);
         setSelectedAssignment(data);
       }
     } catch (requestError) {
-      setError(getApiErrorMessage(requestError, "Khong thuc hien duoc thao tac."));
+      setError(getApiErrorMessage(requestError, "Không thực hiện được thao tác."));
     }
   };
 
@@ -133,15 +133,15 @@ function AssignmentManagement() {
       const { data } = await axiosClient.get(`/api/assignments/${assignmentId}`);
       setSelectedAssignment(data);
     } catch (requestError) {
-      setError(getApiErrorMessage(requestError, "Khong tai duoc chi tiet phieu cap phat."));
+      setError(getApiErrorMessage(requestError, "Không tải được chi tiết phiếu cấp phát."));
     }
   };
 
   return (
     <div className="page-stack">
       <PageHeader
-        title="Cap phat tai san"
-        description="Thuc hien luong tao phieu, phe duyet va hoan tat cap phat tai san."
+        title="Cấp phát tài sản"
+        description="Thực hiện luồng tạo phiếu, phê duyệt và hoàn tất cấp phát tài sản."
       />
 
       {message ? <div className="alert alert-success">{message}</div> : null}
@@ -150,13 +150,13 @@ function AssignmentManagement() {
       <div className="content-grid">
         <section className="content-card">
           <div className="card-head">
-            <h3>Tao phieu cap phat</h3>
-            <p>Chon tai san o trang thai san sang de lap phieu moi.</p>
+            <h3>Tạo phiếu cấp phát</h3>
+            <p>Chọn tài sản ở trạng thái sẵn sàng để lập phiếu mới.</p>
           </div>
 
           <form className="form-grid" onSubmit={handleCreate}>
             <div>
-              <label className="form-label">Ngay cap phat</label>
+              <label className="form-label">Ngày cấp phát</label>
               <input
                 type="date"
                 className="form-control"
@@ -169,7 +169,7 @@ function AssignmentManagement() {
             </div>
 
             <div>
-              <label className="form-label">Phong ban nguon</label>
+              <label className="form-label">Phòng ban nguồn</label>
               <select
                 className="form-select"
                 name="sourceDepartmentId"
@@ -177,7 +177,7 @@ function AssignmentManagement() {
                 onChange={handleChange}
                 disabled={!canCreate}
               >
-                <option value="">Khong bat buoc</option>
+                <option value="">Không bắt buộc</option>
                 {lookups?.departments?.map((item) => (
                   <option key={item.id} value={item.id}>
                     {item.name}
@@ -187,7 +187,7 @@ function AssignmentManagement() {
             </div>
 
             <div>
-              <label className="form-label">Phong ban nhan</label>
+              <label className="form-label">Phòng ban nhận</label>
               <select
                 className="form-select"
                 name="targetDepartmentId"
@@ -195,7 +195,7 @@ function AssignmentManagement() {
                 onChange={handleChange}
                 disabled={!canCreate}
               >
-                <option value="">Khong bat buoc</option>
+                <option value="">Không bắt buộc</option>
                 {lookups?.departments?.map((item) => (
                   <option key={item.id} value={item.id}>
                     {item.name}
@@ -205,7 +205,7 @@ function AssignmentManagement() {
             </div>
 
             <div>
-              <label className="form-label">Nguoi nhan</label>
+              <label className="form-label">Người nhận</label>
               <select
                 className="form-select"
                 name="targetUserId"
@@ -213,27 +213,27 @@ function AssignmentManagement() {
                 onChange={handleChange}
                 disabled={!canCreate}
               >
-                <option value="">Khong bat buoc</option>
+                <option value="">Không bắt buộc</option>
                 {lookups?.users?.map((item) => (
                   <option key={item.id} value={item.id}>
-                    {item.fullName} - {item.departmentName || "Khong co phong ban"}
+                    {item.fullName} - {item.departmentName || "Không có phòng ban"}
                   </option>
                 ))}
               </select>
             </div>
 
             <div className="form-grid form-grid--full">
-              <label className="form-label">Ly do</label>
+              <label className="form-label">Lý do</label>
               <input type="text" className="form-control" name="reason" value={form.reason} onChange={handleChange} disabled={!canCreate} />
             </div>
 
             <div className="form-grid form-grid--full">
-              <label className="form-label">Ghi chu</label>
+              <label className="form-label">Ghi chú</label>
               <textarea className="form-control" rows="3" name="note" value={form.note} onChange={handleChange} disabled={!canCreate} />
             </div>
 
             <div className="form-grid form-grid--full">
-              <label className="form-label">Tai san san sang cap phat</label>
+              <label className="form-label">Tài sản sẵn sàng cấp phát</label>
               <div className="selection-grid">
                 {availableAssets.length ? (
                   availableAssets.map((asset) => (
@@ -251,7 +251,7 @@ function AssignmentManagement() {
                     </label>
                   ))
                 ) : (
-                  <div className="empty-panel">Khong co tai san nao san sang cap phat.</div>
+                  <div className="empty-panel">Không có tài sản nào sẵn sàng cấp phát.</div>
                 )}
               </div>
             </div>
@@ -259,7 +259,7 @@ function AssignmentManagement() {
             {canCreate ? (
               <div className="form-actions">
                 <button type="submit" className="btn btn-primary">
-                  Tao phieu cap phat
+                  Tạo phiếu cấp phát
                 </button>
               </div>
             ) : null}
@@ -268,19 +268,19 @@ function AssignmentManagement() {
 
         <section className="content-card content-card--wide">
           <div className="card-head">
-            <h3>Danh sach phieu cap phat</h3>
-            <p>Chon 1 phieu de xem chi tiet va thuc hien thao tac tiep theo.</p>
+            <h3>Danh sách phiếu cấp phát</h3>
+            <p>Chọn 1 phiếu để xem chi tiết và thực hiện thao tác tiếp theo.</p>
           </div>
 
           <div className="table-responsive">
             <table className="table align-middle custom-table">
               <thead>
                 <tr>
-                  <th>Ma phieu</th>
-                  <th>Ngay</th>
-                  <th>Nguoi nhan</th>
-                  <th>Trang thai</th>
-                  <th className="text-end">Tac vu</th>
+                  <th>Mã phiếu</th>
+                  <th>Ngày</th>
+                  <th>Người nhận</th>
+                  <th>Trạng thái</th>
+                  <th className="text-end">Tác vụ</th>
                 </tr>
               </thead>
               <tbody>
@@ -306,7 +306,7 @@ function AssignmentManagement() {
                                 handleAction(assignment.assignmentFormId, "approve");
                               }}
                             >
-                              Phe duyet
+                              Phê duyệt
                             </button>
                           ) : null}
                           {canComplete && assignment.status === "CONFIRMED" ? (
@@ -318,7 +318,7 @@ function AssignmentManagement() {
                                 handleAction(assignment.assignmentFormId, "complete");
                               }}
                             >
-                              Hoan tat
+                              Hoàn tất
                             </button>
                           ) : null}
                         </div>
@@ -328,7 +328,7 @@ function AssignmentManagement() {
                 ) : (
                   <tr>
                     <td colSpan="5" className="text-center text-muted">
-                      {loading ? "Dang tai..." : "Chua co phieu cap phat."}
+                      {loading ? "Đang tải..." : "Chưa có phiếu cấp phát."}
                     </td>
                   </tr>
                 )}
@@ -340,19 +340,19 @@ function AssignmentManagement() {
             <div className="detail-stack mt-4">
               <div className="detail-grid">
                 <div>
-                  <span className="detail-label">Ma phieu</span>
+                  <span className="detail-label">Mã phiếu</span>
                   <strong>{selectedAssignment.formCode}</strong>
                 </div>
                 <div>
-                  <span className="detail-label">Ngay cap phat</span>
+                  <span className="detail-label">Ngày cấp phát</span>
                   <strong>{formatDate(selectedAssignment.assignmentDate)}</strong>
                 </div>
                 <div>
-                  <span className="detail-label">Nguoi lap</span>
+                  <span className="detail-label">Người lập</span>
                   <strong>{selectedAssignment.issuedByUser?.fullName || "--"}</strong>
                 </div>
                 <div>
-                  <span className="detail-label">Trang thai</span>
+                  <span className="detail-label">Trạng thái</span>
                   <StatusBadge status={selectedAssignment.status} />
                 </div>
               </div>

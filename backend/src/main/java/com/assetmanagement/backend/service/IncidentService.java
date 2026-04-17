@@ -97,7 +97,7 @@ public class IncidentService {
             asset.getAssignedUser(),
             asset.getAssignedUser(),
             reportedBy,
-            "Ghi nhan bao hong / su co tai san."
+            "Ghi nhận báo hỏng / sự cố tài sản."
         );
 
         return ResponseMapper.toIncidentResponse(savedIncident);
@@ -111,7 +111,7 @@ public class IncidentService {
             !SystemCodes.INCIDENT_STATUS_OPEN.equals(incident.getStatus())
                 && !SystemCodes.INCIDENT_STATUS_IN_REVIEW.equals(incident.getStatus())
         ) {
-            throw new BusinessException(HttpStatus.BAD_REQUEST, "Chi su co dang mo moi co the phan cong xu ly.");
+            throw new BusinessException(HttpStatus.BAD_REQUEST, "Chỉ sự cố đang mở mới có thể phân công xử lý.");
         }
 
         User assignedTo = referenceDataService.requireUser(request.getAssignedToUserId());
@@ -129,7 +129,7 @@ public class IncidentService {
         IncidentReport incident = referenceDataService.requireIncident(incidentId);
         User actingUser = referenceDataService.requireUser(request.getActingUserId());
         if (SystemCodes.INCIDENT_STATUS_CONVERTED.equals(incident.getStatus())) {
-            throw new BusinessException(HttpStatus.BAD_REQUEST, "Su co da duoc chuyen sang bao tri, khong the dong truc tiep.");
+            throw new BusinessException(HttpStatus.BAD_REQUEST, "Sự cố đã được chuyển sang bảo trì, không thể đóng trực tiếp.");
         }
 
         String nextStatus = request.getStatus().trim().toUpperCase();
@@ -138,7 +138,7 @@ public class IncidentService {
                 && !SystemCodes.INCIDENT_STATUS_REJECTED.equals(nextStatus)
                 && !SystemCodes.INCIDENT_STATUS_CANCELED.equals(nextStatus)
         ) {
-            throw new BusinessException(HttpStatus.BAD_REQUEST, "Trang thai dong su co khong hop le.");
+            throw new BusinessException(HttpStatus.BAD_REQUEST, "Trạng thái đóng sự cố không hợp lệ.");
         }
 
         incident.setStatus(nextStatus);
@@ -165,7 +165,7 @@ public class IncidentService {
             actingUser,
             StringUtils.hasText(request.getResolutionNote())
                 ? request.getResolutionNote()
-                : "Dong su co va dua tai san ve trang thai van hanh."
+                : "Đóng sự cố và đưa tài sản về trạng thái vận hành."
         );
 
         return ResponseMapper.toIncidentResponse(incidentReportRepository.save(incident));
@@ -179,10 +179,10 @@ public class IncidentService {
             !SystemCodes.INCIDENT_STATUS_OPEN.equals(incident.getStatus())
                 && !SystemCodes.INCIDENT_STATUS_IN_REVIEW.equals(incident.getStatus())
         ) {
-            throw new BusinessException(HttpStatus.BAD_REQUEST, "Chi su co dang mo moi co the chuyen sang bao tri.");
+            throw new BusinessException(HttpStatus.BAD_REQUEST, "Chỉ sự cố đang mở mới có thể chuyển sang bảo trì.");
         }
         if (maintenanceTicketRepository.existsByIncidentReport_IncidentReportId(incidentId)) {
-            throw new BusinessException(HttpStatus.CONFLICT, "Bao hong nay da duoc chuyen thanh phieu bao tri.");
+            throw new BusinessException(HttpStatus.CONFLICT, "Báo hỏng này đã được chuyển thành phiếu bảo trì.");
         }
 
         MaintenanceTicketRequest ticketRequest = new MaintenanceTicketRequest();
@@ -267,7 +267,7 @@ public class IncidentService {
                 asset.getAssignedUser(),
                 asset.getAssignedUser(),
                 actingUser,
-                "Chuyen bao hong thanh phieu bao tri."
+                "Chuyển báo hỏng thành phiếu bảo trì."
             );
         }
     }

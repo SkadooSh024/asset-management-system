@@ -8,13 +8,13 @@ import jakarta.validation.constraints.NotNull;
 
 public class AssetRequest {
 
-    @NotBlank(message = "Ma tai san khong duoc de trong.")
+    @NotBlank(message = "Mã tài sản không được để trống.")
         private String assetCode;
 
-        @NotBlank(message = "Ten tai san khong duoc de trong.")
+        @NotBlank(message = "Tên tài sản không được để trống.")
         private String assetName;
 
-        @NotNull(message = "Danh muc tai san khong duoc de trong.")
+        @NotNull(message = "Danh mục tài sản không được để trống.")
         private Long categoryId;
 
         private Long currentStatusId;
@@ -47,7 +47,7 @@ public class AssetRequest {
 
         private Boolean isActive;
 
-        @NotNull(message = "Nguoi thao tac khong duoc de trong.")
+        @NotNull(message = "Người thao tác không được để trống.")
         private Long actingUserId;
 
     public String getAssetCode() {

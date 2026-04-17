@@ -120,7 +120,7 @@ public class CatalogService {
         assetCategoryRepository.findByCategoryCode(categoryCode.trim().toUpperCase())
             .filter(existing -> !existing.getCategoryId().equals(currentCategoryId))
             .ifPresent(existing -> {
-                throw new BusinessException(HttpStatus.CONFLICT, "Ma danh muc tai san da ton tai.");
+                throw new BusinessException(HttpStatus.CONFLICT, "Mã danh mục tài sản đã tồn tại.");
             });
     }
 
@@ -131,7 +131,7 @@ public class CatalogService {
         assetStatusRepository.findByStatusCode(statusCode.trim().toUpperCase())
             .filter(existing -> !existing.getStatusId().equals(currentStatusId))
             .ifPresent(existing -> {
-                throw new BusinessException(HttpStatus.CONFLICT, "Ma trang thai tai san da ton tai.");
+                throw new BusinessException(HttpStatus.CONFLICT, "Mã trạng thái tài sản đã tồn tại.");
             });
     }
 }

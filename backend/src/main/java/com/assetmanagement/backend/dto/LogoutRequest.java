@@ -4,7 +4,7 @@ import jakarta.validation.constraints.NotBlank;
 
 public class LogoutRequest {
 
-    @NotBlank(message = "Ten dang nhap khong duoc de trong.")
+    @NotBlank(message = "Tên đăng nhập không được để trống.")
         private String username;
 
     public LogoutRequest() {

@@ -9,10 +9,10 @@ import jakarta.validation.constraints.NotNull;
 
 public class AssignmentCreateRequest {
 
-    @NotNull(message = "Nguoi thao tac khong duoc de trong.")
+    @NotNull(message = "Người thao tác không được để trống.")
         private Long actingUserId;
 
-        @NotNull(message = "Ngay cap phat khong duoc de trong.")
+        @NotNull(message = "Ngày cấp phát không được để trống.")
         private LocalDate assignmentDate;
 
         private Long sourceDepartmentId;
@@ -26,7 +26,7 @@ public class AssignmentCreateRequest {
         private String note;
 
         @Valid
-        @NotEmpty(message = "Phieu cap phat phai co it nhat 1 tai san.")
+        @NotEmpty(message = "Phiếu cấp phát phải có ít nhất 1 tài sản.")
         private List<AssignmentItemRequest> details;
 
     public Long getActingUserId() {

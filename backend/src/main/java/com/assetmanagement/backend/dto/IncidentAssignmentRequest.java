@@ -4,10 +4,10 @@ import jakarta.validation.constraints.NotNull;
 
 public class IncidentAssignmentRequest {
 
-    @NotNull(message = "Nguoi thao tac khong duoc de trong.")
+    @NotNull(message = "Người thao tác không được để trống.")
         private Long actingUserId;
 
-        @NotNull(message = "Nguoi duoc phan cong khong duoc de trong.")
+        @NotNull(message = "Người được phân công không được để trống.")
         private Long assignedToUserId;
 
         private String note;

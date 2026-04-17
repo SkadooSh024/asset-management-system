@@ -64,7 +64,7 @@ public class AssignmentService {
         Department targetDepartment = referenceDataService.getDepartmentOrNull(request.getTargetDepartmentId());
         User targetUser = referenceDataService.getUserOrNull(request.getTargetUserId());
         if (targetDepartment == null && targetUser == null) {
-            throw new BusinessException(HttpStatus.BAD_REQUEST, "Phieu cap phat phai co phong ban nhan hoac nguoi nhan.");
+            throw new BusinessException(HttpStatus.BAD_REQUEST, "Phiếu cấp phát phải có phòng ban nhận hoặc người nhận.");
         }
 
         AssignmentForm form = new AssignmentForm();
@@ -85,7 +85,7 @@ public class AssignmentService {
             .stream()
             .map(item -> {
                 if (!uniqueAssetIds.add(item.getAssetId())) {
-                    throw new BusinessException(HttpStatus.BAD_REQUEST, "Phieu cap phat khong duoc chua tai san trung lap.");
+                    throw new BusinessException(HttpStatus.BAD_REQUEST, "Phiếu cấp phát không được chứa tài sản trùng lặp.");
                 }
 
                 Asset asset = referenceDataService.requireAsset(item.getAssetId());
@@ -109,7 +109,7 @@ public class AssignmentService {
     public AssignmentResponse approveAssignment(Long assignmentId, AssignmentActionRequest request) {
         AssignmentForm form = requireAssignment(assignmentId);
         if (!SystemCodes.ASSIGNMENT_STATUS_DRAFT.equals(form.getStatus())) {
-            throw new BusinessException(HttpStatus.BAD_REQUEST, "Chi phieu dang o trang thai nhap moi co the phe duyet.");
+            throw new BusinessException(HttpStatus.BAD_REQUEST, "Chỉ phiếu đang ở trạng thái nháp mới có thể phê duyệt.");
         }
 
         User actingUser = referenceDataService.requireUser(request.getActingUserId());
@@ -127,7 +127,7 @@ public class AssignmentService {
     public AssignmentResponse completeAssignment(Long assignmentId, AssignmentActionRequest request) {
         AssignmentForm form = requireAssignment(assignmentId);
         if (!SystemCodes.ASSIGNMENT_STATUS_CONFIRMED.equals(form.getStatus())) {
-            throw new BusinessException(HttpStatus.BAD_REQUEST, "Chi phieu da duoc phe duyet moi co the hoan tat.");
+            throw new BusinessException(HttpStatus.BAD_REQUEST, "Chỉ phiếu đã được phê duyệt mới có thể hoàn tất.");
         }
 
         User actingUser = referenceDataService.requireUser(request.getActingUserId());
@@ -162,7 +162,7 @@ public class AssignmentService {
                 oldUser,
                 form.getTargetUser(),
                 actingUser,
-                StringUtils.hasText(request.getNote()) ? request.getNote() : "Hoan tat cap phat tai san."
+                StringUtils.hasText(request.getNote()) ? request.getNote() : "Hoàn tất cấp phát tài sản."
             );
         }
 
@@ -177,15 +177,15 @@ public class AssignmentService {
 
     private AssignmentForm requireAssignment(Long assignmentId) {
         return assignmentFormRepository.findById(assignmentId)
-            .orElseThrow(() -> new BusinessException(HttpStatus.NOT_FOUND, "Khong tim thay phieu cap phat."));
+            .orElseThrow(() -> new BusinessException(HttpStatus.NOT_FOUND, "Không tìm thấy phiếu cấp phát."));
     }
 
     private void validateAssignableAsset(Asset asset) {
         if (!Boolean.TRUE.equals(asset.getIsActive())) {
-            throw new BusinessException(HttpStatus.BAD_REQUEST, "Tai san khong con hoat dong de cap phat.");
+            throw new BusinessException(HttpStatus.BAD_REQUEST, "Tài sản không còn hoạt động để cấp phát.");
         }
         if (!Boolean.TRUE.equals(asset.getCurrentStatus().getIsAllocatable())) {
-            throw new BusinessException(HttpStatus.BAD_REQUEST, "Tai san " + asset.getAssetCode() + " hien khong the cap phat.");
+            throw new BusinessException(HttpStatus.BAD_REQUEST, "Tài sản " + asset.getAssetCode() + " hiện không thể cấp phát.");
         }
     }
 }

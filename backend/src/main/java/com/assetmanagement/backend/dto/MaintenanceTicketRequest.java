@@ -7,23 +7,23 @@ import jakarta.validation.constraints.NotNull;
 
 public class MaintenanceTicketRequest {
 
-    @NotNull(message = "Nguoi thao tac khong duoc de trong.")
+    @NotNull(message = "Người thao tác không được để trống.")
         private Long actingUserId;
 
         private Long incidentReportId;
 
-        @NotNull(message = "Tai san khong duoc de trong.")
+        @NotNull(message = "Tài sản không được để trống.")
         private Long assetId;
 
         private Long assignedToUserId;
 
-        @NotBlank(message = "Muc do uu tien khong duoc de trong.")
+        @NotBlank(message = "Mức độ ưu tiên không được để trống.")
         private String priority;
 
-        @NotBlank(message = "Loai bao tri khong duoc de trong.")
+        @NotBlank(message = "Loại bảo trì không được để trống.")
         private String maintenanceType;
 
-        @NotBlank(message = "Mo ta van de khong duoc de trong.")
+        @NotBlank(message = "Mô tả vấn đề không được để trống.")
         private String problemDescription;
 
         private String externalServiceName;

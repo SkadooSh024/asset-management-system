@@ -5,6 +5,13 @@ import StatCard from "../../components/common/StatCard";
 import StatusBadge from "../../components/common/StatusBadge";
 import { formatDate, formatDateTime, getApiErrorMessage } from "../../utils/format";
 
+const PRIORITY_LABELS = {
+  LOW: "Thấp",
+  MEDIUM: "Trung bình",
+  HIGH: "Cao",
+  URGENT: "Khẩn cấp",
+};
+
 function Dashboard() {
   const [summary, setSummary] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -19,7 +26,7 @@ function Dashboard() {
         const { data } = await axiosClient.get("/api/dashboard/summary");
         setSummary(data);
       } catch (requestError) {
-        setError(getApiErrorMessage(requestError, "Khong tai duoc dashboard."));
+        setError(getApiErrorMessage(requestError, "Không tải được bảng tổng quan."));
       } finally {
         setLoading(false);
       }
@@ -31,35 +38,35 @@ function Dashboard() {
   return (
     <div className="page-stack">
       <PageHeader
-        title="Tong quan he thong"
-        description="Theo doi nhanh tai san, su co, cap phat va bao tri de dieu hanh demo nghiep vu."
+        title="Tổng quan hệ thống"
+        description="Theo dõi nhanh tài sản, sự cố, cấp phát và bảo trì để điều hành demo nghiệp vụ."
       />
 
       {error ? <div className="alert alert-danger">{error}</div> : null}
 
       <section className="stats-grid">
-        <StatCard label="Tong tai san" value={loading ? "..." : summary?.totalAssets || 0} />
-        <StatCard label="San sang cap phat" value={loading ? "..." : summary?.readyAssets || 0} tone="success" />
-        <StatCard label="Dang su dung" value={loading ? "..." : summary?.assignedAssets || 0} tone="primary" />
-        <StatCard label="Su co dang mo" value={loading ? "..." : summary?.openIncidents || 0} tone="warning" />
-        <StatCard label="Bao tri dang xu ly" value={loading ? "..." : summary?.activeMaintenanceTickets || 0} tone="danger" />
-        <StatCard label="Phieu cap phat cho duyet" value={loading ? "..." : summary?.pendingAssignments || 0} tone="muted" />
+        <StatCard label="Tổng tài sản" value={loading ? "..." : summary?.totalAssets || 0} />
+        <StatCard label="Sẵn sàng cấp phát" value={loading ? "..." : summary?.readyAssets || 0} tone="success" />
+        <StatCard label="Đang sử dụng" value={loading ? "..." : summary?.assignedAssets || 0} tone="primary" />
+        <StatCard label="Sự cố đang mở" value={loading ? "..." : summary?.openIncidents || 0} tone="warning" />
+        <StatCard label="Bảo trì đang xử lý" value={loading ? "..." : summary?.activeMaintenanceTickets || 0} tone="danger" />
+        <StatCard label="Phiếu cấp phát chờ duyệt" value={loading ? "..." : summary?.pendingAssignments || 0} tone="muted" />
       </section>
 
       <div className="content-grid">
         <section className="content-card">
           <div className="card-head">
-            <h3>Cap phat gan day</h3>
-            <p>Cac phieu cap phat moi nhat trong he thong</p>
+            <h3>Cấp phát gần đây</h3>
+            <p>Các phiếu cấp phát mới nhất trong hệ thống</p>
           </div>
           <div className="table-responsive">
             <table className="table align-middle custom-table">
               <thead>
                 <tr>
-                  <th>Ma phieu</th>
-                  <th>Ngay</th>
-                  <th>Nguoi nhan</th>
-                  <th>Trang thai</th>
+                  <th>Mã phiếu</th>
+                  <th>Ngày</th>
+                  <th>Người nhận</th>
+                  <th>Trạng thái</th>
                 </tr>
               </thead>
               <tbody>
@@ -75,7 +82,7 @@ function Dashboard() {
                 ) : (
                   <tr>
                     <td colSpan="4" className="text-center text-muted">
-                      Chua co du lieu cap phat.
+                      Chưa có dữ liệu cấp phát.
                     </td>
                   </tr>
                 )}
@@ -86,17 +93,17 @@ function Dashboard() {
 
         <section className="content-card">
           <div className="card-head">
-            <h3>Su co gan day</h3>
-            <p>Cac yeu cau bao hong / ho tro vua duoc ghi nhan</p>
+            <h3>Sự cố gần đây</h3>
+            <p>Các yêu cầu báo hỏng hoặc hỗ trợ vừa được ghi nhận</p>
           </div>
           <div className="table-responsive">
             <table className="table align-middle custom-table">
               <thead>
                 <tr>
-                  <th>Ma bao cao</th>
-                  <th>Tieu de</th>
-                  <th>Ngay tao</th>
-                  <th>Trang thai</th>
+                  <th>Mã báo cáo</th>
+                  <th>Tiêu đề</th>
+                  <th>Ngày tạo</th>
+                  <th>Trạng thái</th>
                 </tr>
               </thead>
               <tbody>
@@ -112,7 +119,7 @@ function Dashboard() {
                 ) : (
                   <tr>
                     <td colSpan="4" className="text-center text-muted">
-                      Chua co du lieu su co.
+                      Chưa có dữ liệu sự cố.
                     </td>
                   </tr>
                 )}
@@ -123,18 +130,18 @@ function Dashboard() {
 
         <section className="content-card content-card--full">
           <div className="card-head">
-            <h3>Phieu bao tri gan day</h3>
-            <p>Theo doi tien do bao tri / sua chua moi nhat</p>
+            <h3>Phiếu bảo trì gần đây</h3>
+            <p>Theo dõi tiến độ bảo trì hoặc sửa chữa mới nhất</p>
           </div>
           <div className="table-responsive">
             <table className="table align-middle custom-table">
               <thead>
                 <tr>
-                  <th>Ma phieu</th>
-                  <th>Tai san</th>
-                  <th>Mo luc</th>
-                  <th>Uu tien</th>
-                  <th>Trang thai</th>
+                  <th>Mã phiếu</th>
+                  <th>Tài sản</th>
+                  <th>Mở lúc</th>
+                  <th>Ưu tiên</th>
+                  <th>Trạng thái</th>
                 </tr>
               </thead>
               <tbody>
@@ -144,14 +151,14 @@ function Dashboard() {
                       <td>{ticket.ticketCode}</td>
                       <td>{ticket.asset?.name}</td>
                       <td>{formatDateTime(ticket.createdAt)}</td>
-                      <td>{ticket.priority}</td>
+                      <td>{PRIORITY_LABELS[ticket.priority] || ticket.priority}</td>
                       <td><StatusBadge status={ticket.status} /></td>
                     </tr>
                   ))
                 ) : (
                   <tr>
                     <td colSpan="5" className="text-center text-muted">
-                      Chua co phieu bao tri.
+                      Chưa có phiếu bảo trì.
                     </td>
                   </tr>
                 )}

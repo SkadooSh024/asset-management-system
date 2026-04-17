@@ -30,14 +30,14 @@ public class AuthService {
     @Transactional
     public LoginResponse login(LoginRequest request) {
         User user = userRepository.findByUsername(request.getUsername())
-            .orElseThrow(() -> new BusinessException(HttpStatus.UNAUTHORIZED, "Sai tai khoan hoac mat khau."));
+            .orElseThrow(() -> new BusinessException(HttpStatus.UNAUTHORIZED, "Sai tài khoản hoặc mật khẩu."));
 
         if (!SystemCodes.USER_STATUS_ACTIVE.equalsIgnoreCase(user.getStatus())) {
-            throw new BusinessException(HttpStatus.FORBIDDEN, "Tai khoan hien khong the dang nhap.");
+            throw new BusinessException(HttpStatus.FORBIDDEN, "Tài khoản hiện không thể đăng nhập.");
         }
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPasswordHash())) {
-            throw new BusinessException(HttpStatus.UNAUTHORIZED, "Sai tai khoan hoac mat khau.");
+            throw new BusinessException(HttpStatus.UNAUTHORIZED, "Sai tài khoản hoặc mật khẩu.");
         }
 
         user.setLastLoginAt(LocalDateTime.now());
@@ -45,7 +45,7 @@ public class AuthService {
 
         return LoginResponse.builder()
             .success(true)
-            .message("Dang nhap thanh cong.")
+            .message("Đăng nhập thành công.")
             .user(ResponseMapper.toUserSession(user))
             .build();
     }
@@ -58,7 +58,7 @@ public class AuthService {
 
         return SimpleMessageResponse.builder()
             .success(true)
-            .message("Dang xuat thanh cong.")
+            .message("Đăng xuất thành công.")
             .build();
     }
 }

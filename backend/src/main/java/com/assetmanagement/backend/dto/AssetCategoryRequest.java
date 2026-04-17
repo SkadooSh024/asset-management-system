@@ -6,10 +6,10 @@ public class AssetCategoryRequest {
 
     private Long parentCategoryId;
 
-        @NotBlank(message = "Ma danh muc khong duoc de trong.")
+        @NotBlank(message = "Mã danh mục không được để trống.")
         private String categoryCode;
 
-        @NotBlank(message = "Ten danh muc khong duoc de trong.")
+        @NotBlank(message = "Tên danh mục không được để trống.")
         private String categoryName;
 
         private Integer defaultWarrantyMonths;

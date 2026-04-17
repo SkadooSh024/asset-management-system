@@ -7,10 +7,10 @@ import jakarta.validation.constraints.NotNull;
 
 public class MaintenanceCompleteRequest {
 
-    @NotNull(message = "Nguoi thao tac khong duoc de trong.")
+    @NotNull(message = "Người thao tác không được để trống.")
         private Long actingUserId;
 
-        @NotBlank(message = "Ket qua bao tri khong duoc de trong.")
+        @NotBlank(message = "Kết quả bảo trì không được để trống.")
         private String resultSummary;
 
         private BigDecimal actualCost;

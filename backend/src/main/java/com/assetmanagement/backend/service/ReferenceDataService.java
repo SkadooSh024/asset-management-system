@@ -83,7 +83,7 @@ public class ReferenceDataService {
 
     public User requireUser(Long userId) {
         return userRepository.findById(userId)
-            .orElseThrow(() -> new BusinessException(HttpStatus.NOT_FOUND, "Khong tim thay nguoi dung."));
+            .orElseThrow(() -> new BusinessException(HttpStatus.NOT_FOUND, "Không tìm thấy người dùng."));
     }
 
     public User getUserOrNull(Long userId) {
@@ -98,12 +98,12 @@ public class ReferenceDataService {
             return null;
         }
         return departmentRepository.findById(departmentId)
-            .orElseThrow(() -> new BusinessException(HttpStatus.NOT_FOUND, "Khong tim thay phong ban."));
+            .orElseThrow(() -> new BusinessException(HttpStatus.NOT_FOUND, "Không tìm thấy phòng ban."));
     }
 
     public AssetCategory requireCategory(Long categoryId) {
         return assetCategoryRepository.findById(categoryId)
-            .orElseThrow(() -> new BusinessException(HttpStatus.NOT_FOUND, "Khong tim thay danh muc tai san."));
+            .orElseThrow(() -> new BusinessException(HttpStatus.NOT_FOUND, "Không tìm thấy danh mục tài sản."));
     }
 
     public AssetCategory getCategoryOrNull(Long categoryId) {
@@ -115,7 +115,7 @@ public class ReferenceDataService {
 
     public AssetStatus requireAssetStatus(Long statusId) {
         return assetStatusRepository.findById(statusId)
-            .orElseThrow(() -> new BusinessException(HttpStatus.NOT_FOUND, "Khong tim thay trang thai tai san."));
+            .orElseThrow(() -> new BusinessException(HttpStatus.NOT_FOUND, "Không tìm thấy trạng thái tài sản."));
     }
 
     public AssetStatus getAssetStatusOrNull(Long statusId) {
@@ -127,16 +127,16 @@ public class ReferenceDataService {
 
     public AssetStatus requireAssetStatusByCode(String statusCode) {
         return assetStatusRepository.findByStatusCode(statusCode)
-            .orElseThrow(() -> new BusinessException(HttpStatus.NOT_FOUND, "Khong tim thay trang thai tai san " + statusCode + "."));
+            .orElseThrow(() -> new BusinessException(HttpStatus.NOT_FOUND, "Không tìm thấy trạng thái tài sản " + statusCode + "."));
     }
 
     public Asset requireAsset(Long assetId) {
         return assetRepository.findById(assetId)
-            .orElseThrow(() -> new BusinessException(HttpStatus.NOT_FOUND, "Khong tim thay tai san."));
+            .orElseThrow(() -> new BusinessException(HttpStatus.NOT_FOUND, "Không tìm thấy tài sản."));
     }
 
     public IncidentReport requireIncident(Long incidentReportId) {
         return incidentReportRepository.findById(incidentReportId)
-            .orElseThrow(() -> new BusinessException(HttpStatus.NOT_FOUND, "Khong tim thay bao hong / su co."));
+            .orElseThrow(() -> new BusinessException(HttpStatus.NOT_FOUND, "Không tìm thấy báo hỏng / sự cố."));
     }
 }

@@ -7,15 +7,15 @@ import jakarta.validation.constraints.NotNull;
 
 public class IncidentConvertRequest {
 
-    @NotNull(message = "Nguoi thao tac khong duoc de trong.")
+    @NotNull(message = "Người thao tác không được để trống.")
         private Long actingUserId;
 
         private Long assignedToUserId;
 
-        @NotBlank(message = "Muc do uu tien bao tri khong duoc de trong.")
+        @NotBlank(message = "Mức độ ưu tiên bảo trì không được để trống.")
         private String priority;
 
-        @NotBlank(message = "Loai bao tri khong duoc de trong.")
+        @NotBlank(message = "Loại bảo trì không được để trống.")
         private String maintenanceType;
 
         private String problemDescription;

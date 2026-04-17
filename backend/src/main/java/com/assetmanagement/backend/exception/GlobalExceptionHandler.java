@@ -24,7 +24,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, Object>> handleValidationException(MethodArgumentNotValidException exception) {
         Map<String, Object> response = new HashMap<>();
-        response.put("message", "Du lieu gui len khong hop le.");
+        response.put("message", "Dữ liệu gửi lên không hợp lệ.");
         response.put(
             "errors",
             exception.getBindingResult()
@@ -42,7 +42,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, Object>> handleUnexpectedException(Exception exception) {
         Map<String, Object> response = new HashMap<>();
-        response.put("message", "He thong gap loi khong mong muon.");
+        response.put("message", "Hệ thống gặp lỗi không mong muốn.");
         response.put("status", HttpStatus.INTERNAL_SERVER_ERROR.value());
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
     }

@@ -36,7 +36,7 @@ export function formatCurrency(value) {
   }).format(Number(value));
 }
 
-export function getApiErrorMessage(error, fallback = "Co loi xay ra.") {
+export function getApiErrorMessage(error, fallback = "Có lỗi xảy ra.") {
   return (
     error?.response?.data?.message ||
     error?.response?.data?.error ||

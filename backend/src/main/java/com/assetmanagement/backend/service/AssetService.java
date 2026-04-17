@@ -74,7 +74,7 @@ public class AssetService {
             null,
             savedAsset.getAssignedUser(),
             actingUser,
-            "Khoi tao tai san moi trong he thong."
+            "Khởi tạo tài sản mới trong hệ thống."
         );
 
         return ResponseMapper.toAssetResponse(savedAsset, assetHistoryService.getAssetHistories(savedAsset.getAssetId()));
@@ -105,7 +105,7 @@ public class AssetService {
             oldAssignedUser,
             savedAsset.getAssignedUser(),
             actingUser,
-            "Cap nhat thong tin tai san."
+            "Cập nhật thông tin tài sản."
         );
 
         return ResponseMapper.toAssetResponse(savedAsset, assetHistoryService.getAssetHistories(savedAsset.getAssetId()));
@@ -140,7 +140,7 @@ public class AssetService {
             oldAssignedUser,
             null,
             actingUser,
-            StringUtils.hasText(request.getNote()) ? request.getNote() : "Danh dau thanh ly tai san."
+            StringUtils.hasText(request.getNote()) ? request.getNote() : "Đánh dấu thanh lý tài sản."
         );
 
         return ResponseMapper.toAssetResponse(savedAsset, assetHistoryService.getAssetHistories(savedAsset.getAssetId()));
@@ -193,7 +193,7 @@ public class AssetService {
         assetRepository.findByAssetCode(assetCode.trim().toUpperCase())
             .filter(existing -> !existing.getAssetId().equals(currentAssetId))
             .ifPresent(existing -> {
-                throw new BusinessException(HttpStatus.CONFLICT, "Ma tai san da ton tai.");
+                throw new BusinessException(HttpStatus.CONFLICT, "Mã tài sản đã tồn tại.");
             });
     }
 }

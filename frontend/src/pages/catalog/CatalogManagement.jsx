@@ -24,6 +24,14 @@ const EMPTY_STATUS_FORM = {
   description: "",
 };
 
+const STATUS_GROUP_LABELS = {
+  STORAGE: "Lưu kho",
+  USAGE: "Sử dụng",
+  MAINTENANCE: "Bảo trì",
+  END_OF_LIFE: "Kết thúc vòng đời",
+  EXCEPTION: "Ngoại lệ",
+};
+
 function CatalogManagement() {
   const user = getStoredUser();
   const [categories, setCategories] = useState([]);
@@ -51,7 +59,7 @@ function CatalogManagement() {
       setCategories(categoriesResponse.data);
       setStatuses(statusesResponse.data);
     } catch (requestError) {
-      setError(getApiErrorMessage(requestError, "Khong tai duoc du lieu danh muc."));
+      setError(getApiErrorMessage(requestError, "Không tải được dữ liệu danh mục."));
     } finally {
       setLoading(false);
     }
@@ -90,7 +98,7 @@ function CatalogManagement() {
           defaultWarrantyMonths: categoryForm.defaultWarrantyMonths || null,
           defaultMaintenanceCycleDays: categoryForm.defaultMaintenanceCycleDays || null,
         });
-        setMessage("Cap nhat danh muc tai san thanh cong.");
+        setMessage("Cập nhật danh mục tài sản thành công.");
       } else {
         await axiosClient.post("/api/catalog/categories", {
           ...categoryForm,
@@ -98,14 +106,14 @@ function CatalogManagement() {
           defaultWarrantyMonths: categoryForm.defaultWarrantyMonths || null,
           defaultMaintenanceCycleDays: categoryForm.defaultMaintenanceCycleDays || null,
         });
-        setMessage("Them danh muc tai san thanh cong.");
+        setMessage("Thêm danh mục tài sản thành công.");
       }
 
       setCategoryForm(EMPTY_CATEGORY_FORM);
       setEditingCategoryId(null);
       fetchCatalog();
     } catch (requestError) {
-      setError(getApiErrorMessage(requestError, "Khong luu duoc danh muc tai san."));
+      setError(getApiErrorMessage(requestError, "Không lưu được danh mục tài sản."));
     }
   };
 
@@ -117,17 +125,17 @@ function CatalogManagement() {
     try {
       if (editingStatusId) {
         await axiosClient.put(`/api/catalog/statuses/${editingStatusId}`, statusForm);
-        setMessage("Cap nhat trang thai tai san thanh cong.");
+        setMessage("Cập nhật trạng thái tài sản thành công.");
       } else {
         await axiosClient.post("/api/catalog/statuses", statusForm);
-        setMessage("Them trang thai tai san thanh cong.");
+        setMessage("Thêm trạng thái tài sản thành công.");
       }
 
       setStatusForm(EMPTY_STATUS_FORM);
       setEditingStatusId(null);
       fetchCatalog();
     } catch (requestError) {
-      setError(getApiErrorMessage(requestError, "Khong luu duoc trang thai tai san."));
+      setError(getApiErrorMessage(requestError, "Không lưu được trạng thái tài sản."));
     }
   };
 
@@ -162,18 +170,18 @@ function CatalogManagement() {
 
     try {
       await axiosClient.patch(`/api/catalog/categories/${categoryId}/deactivate`);
-      setMessage("Da ngung su dung danh muc.");
+      setMessage("Đã ngừng sử dụng danh mục.");
       fetchCatalog();
     } catch (requestError) {
-      setError(getApiErrorMessage(requestError, "Khong the ngung su dung danh muc."));
+      setError(getApiErrorMessage(requestError, "Không thể ngừng sử dụng danh mục."));
     }
   };
 
   return (
     <div className="page-stack">
       <PageHeader
-        title="Quan ly danh muc tai san"
-        description="Quan ly nhom tai san, chinh sach mac dinh va cac trang thai van hanh cua tai san."
+        title="Quản lý danh mục tài sản"
+        description="Quản lý nhóm tài sản, chính sách mặc định và các trạng thái vận hành của tài sản."
       />
 
       {message ? <div className="alert alert-success">{message}</div> : null}
@@ -182,13 +190,13 @@ function CatalogManagement() {
       <div className="content-grid">
         <section className="content-card">
           <div className="card-head">
-            <h3>Danh muc tai san</h3>
-            <p>Phuc vu tao tai san va ap dung chinh sach mac dinh.</p>
+            <h3>Danh mục tài sản</h3>
+            <p>Phục vụ tạo tài sản và áp dụng chính sách mặc định.</p>
           </div>
 
           <form className="form-grid" onSubmit={submitCategory}>
             <div>
-              <label className="form-label">Ma danh muc</label>
+              <label className="form-label">Mã danh mục</label>
               <input
                 type="text"
                 name="categoryCode"
@@ -201,7 +209,7 @@ function CatalogManagement() {
             </div>
 
             <div>
-              <label className="form-label">Ten danh muc</label>
+              <label className="form-label">Tên danh mục</label>
               <input
                 type="text"
                 name="categoryName"
@@ -214,7 +222,7 @@ function CatalogManagement() {
             </div>
 
             <div>
-              <label className="form-label">Danh muc cha</label>
+              <label className="form-label">Danh mục cha</label>
               <select
                 name="parentCategoryId"
                 className="form-select"
@@ -222,7 +230,7 @@ function CatalogManagement() {
                 onChange={handleCategoryChange}
                 disabled={!canManage}
               >
-                <option value="">Khong co</option>
+                <option value="">Không có</option>
                 {categories
                   .filter((item) => item.categoryId !== editingCategoryId)
                   .map((item) => (
@@ -234,7 +242,7 @@ function CatalogManagement() {
             </div>
 
             <div>
-              <label className="form-label">Bao hanh mac dinh (thang)</label>
+              <label className="form-label">Bảo hành mặc định (tháng)</label>
               <input
                 type="number"
                 name="defaultWarrantyMonths"
@@ -246,7 +254,7 @@ function CatalogManagement() {
             </div>
 
             <div>
-              <label className="form-label">Chu ky bao tri (ngay)</label>
+              <label className="form-label">Chu kỳ bảo trì (ngày)</label>
               <input
                 type="number"
                 name="defaultMaintenanceCycleDays"
@@ -268,12 +276,12 @@ function CatalogManagement() {
                 disabled={!canManage}
               />
               <label htmlFor="category-active" className="form-check-label">
-                Dang hoat dong
+                Đang hoạt động
               </label>
             </div>
 
             <div className="form-grid form-grid--full">
-              <label className="form-label">Mo ta</label>
+              <label className="form-label">Mô tả</label>
               <textarea
                 name="description"
                 className="form-control"
@@ -287,7 +295,7 @@ function CatalogManagement() {
             {canManage ? (
               <div className="form-actions">
                 <button type="submit" className="btn btn-primary">
-                  {editingCategoryId ? "Cap nhat danh muc" : "Them danh muc"}
+                  {editingCategoryId ? "Cập nhật danh mục" : "Thêm danh mục"}
                 </button>
                 <button
                   type="button"
@@ -297,7 +305,7 @@ function CatalogManagement() {
                     setEditingCategoryId(null);
                   }}
                 >
-                  Dat lai
+                  Đặt lại
                 </button>
               </div>
             ) : null}
@@ -307,11 +315,11 @@ function CatalogManagement() {
             <table className="table align-middle custom-table">
               <thead>
                 <tr>
-                  <th>Ma</th>
-                  <th>Ten danh muc</th>
-                  <th>Chinh sach</th>
-                  <th>Trang thai</th>
-                  {canManage ? <th className="text-end">Tac vu</th> : null}
+                  <th>Mã</th>
+                  <th>Tên danh mục</th>
+                  <th>Chính sách</th>
+                  <th>Trạng thái</th>
+                  {canManage ? <th className="text-end">Tác vụ</th> : null}
                 </tr>
               </thead>
               <tbody>
@@ -322,13 +330,13 @@ function CatalogManagement() {
                       <td>
                         <strong>{category.categoryName}</strong>
                         <div className="table-subline">
-                          {category.parentCategory ? `Cha: ${category.parentCategory.name}` : "Khong co danh muc cha"}
+                          {category.parentCategory ? `Cha: ${category.parentCategory.name}` : "Không có danh mục cha"}
                         </div>
                       </td>
                       <td>
-                        <div>{category.defaultWarrantyMonths || 0} thang bao hanh</div>
+                        <div>{category.defaultWarrantyMonths || 0} tháng bảo hành</div>
                         <div className="table-subline">
-                          {category.defaultMaintenanceCycleDays || 0} ngay / chu ky bao tri
+                          {category.defaultMaintenanceCycleDays || 0} ngày / chu kỳ bảo trì
                         </div>
                       </td>
                       <td>
@@ -342,7 +350,7 @@ function CatalogManagement() {
                               className="btn btn-sm btn-outline-primary"
                               onClick={() => handleEditCategory(category)}
                             >
-                              Sua
+                              Sửa
                             </button>
                             {category.isActive ? (
                               <button
@@ -350,7 +358,7 @@ function CatalogManagement() {
                                 className="btn btn-sm btn-outline-danger"
                                 onClick={() => deactivateCategory(category.categoryId)}
                               >
-                                Ngung dung
+                                Ngừng dùng
                               </button>
                             ) : null}
                           </div>
@@ -361,7 +369,7 @@ function CatalogManagement() {
                 ) : (
                   <tr>
                     <td colSpan={canManage ? 5 : 4} className="text-center text-muted">
-                      {loading ? "Dang tai..." : "Chua co danh muc tai san."}
+                      {loading ? "Đang tải..." : "Chưa có danh mục tài sản."}
                     </td>
                   </tr>
                 )}
@@ -372,13 +380,13 @@ function CatalogManagement() {
 
         <section className="content-card">
           <div className="card-head">
-            <h3>Trang thai tai san</h3>
-            <p>Quy dinh trang thai nghiep vu va kha nang cap phat.</p>
+            <h3>Trạng thái tài sản</h3>
+            <p>Quy định trạng thái nghiệp vụ và khả năng cấp phát.</p>
           </div>
 
           <form className="form-grid" onSubmit={submitStatus}>
             <div>
-              <label className="form-label">Ma trang thai</label>
+              <label className="form-label">Mã trạng thái</label>
               <input
                 type="text"
                 name="statusCode"
@@ -391,7 +399,7 @@ function CatalogManagement() {
             </div>
 
             <div>
-              <label className="form-label">Ten trang thai</label>
+              <label className="form-label">Tên trạng thái</label>
               <input
                 type="text"
                 name="statusName"
@@ -404,7 +412,7 @@ function CatalogManagement() {
             </div>
 
             <div>
-              <label className="form-label">Nhom trang thai</label>
+              <label className="form-label">Nhóm trạng thái</label>
               <select
                 name="statusGroup"
                 className="form-select"
@@ -412,16 +420,16 @@ function CatalogManagement() {
                 onChange={handleStatusChange}
                 disabled={!canManage}
               >
-                <option value="STORAGE">STORAGE</option>
-                <option value="USAGE">USAGE</option>
-                <option value="MAINTENANCE">MAINTENANCE</option>
-                <option value="END_OF_LIFE">END_OF_LIFE</option>
-                <option value="EXCEPTION">EXCEPTION</option>
+                <option value="STORAGE">Lưu kho</option>
+                <option value="USAGE">Sử dụng</option>
+                <option value="MAINTENANCE">Bảo trì</option>
+                <option value="END_OF_LIFE">Kết thúc vòng đời</option>
+                <option value="EXCEPTION">Ngoại lệ</option>
               </select>
             </div>
 
             <div>
-              <label className="form-label">Thu tu hien thi</label>
+              <label className="form-label">Thứ tự hiển thị</label>
               <input
                 type="number"
                 name="sortOrder"
@@ -443,12 +451,12 @@ function CatalogManagement() {
                 disabled={!canManage}
               />
               <label htmlFor="status-allocatable" className="form-check-label">
-                Co the cap phat
+                Có thể cấp phát
               </label>
             </div>
 
             <div className="form-grid form-grid--full">
-              <label className="form-label">Mo ta</label>
+              <label className="form-label">Mô tả</label>
               <textarea
                 name="description"
                 className="form-control"
@@ -462,7 +470,7 @@ function CatalogManagement() {
             {canManage ? (
               <div className="form-actions">
                 <button type="submit" className="btn btn-primary">
-                  {editingStatusId ? "Cap nhat trang thai" : "Them trang thai"}
+                  {editingStatusId ? "Cập nhật trạng thái" : "Thêm trạng thái"}
                 </button>
                 <button
                   type="button"
@@ -472,7 +480,7 @@ function CatalogManagement() {
                     setEditingStatusId(null);
                   }}
                 >
-                  Dat lai
+                  Đặt lại
                 </button>
               </div>
             ) : null}
@@ -482,11 +490,11 @@ function CatalogManagement() {
             <table className="table align-middle custom-table">
               <thead>
                 <tr>
-                  <th>Ma</th>
-                  <th>Ten trang thai</th>
-                  <th>Nhom</th>
-                  <th>Cap phat</th>
-                  {canManage ? <th className="text-end">Tac vu</th> : null}
+                  <th>Mã</th>
+                  <th>Tên trạng thái</th>
+                  <th>Nhóm</th>
+                  <th>Cấp phát</th>
+                  {canManage ? <th className="text-end">Tác vụ</th> : null}
                 </tr>
               </thead>
               <tbody>
@@ -495,8 +503,8 @@ function CatalogManagement() {
                     <tr key={status.statusId}>
                       <td>{status.statusCode}</td>
                       <td>{status.statusName}</td>
-                      <td>{status.statusGroup}</td>
-                      <td>{status.isAllocatable ? "Co" : "Khong"}</td>
+                      <td>{STATUS_GROUP_LABELS[status.statusGroup] || status.statusGroup}</td>
+                      <td>{status.isAllocatable ? "Có" : "Không"}</td>
                       {canManage ? (
                         <td className="text-end">
                           <button
@@ -504,7 +512,7 @@ function CatalogManagement() {
                             className="btn btn-sm btn-outline-primary"
                             onClick={() => handleEditStatus(status)}
                           >
-                            Sua
+                            Sửa
                           </button>
                         </td>
                       ) : null}
@@ -513,7 +521,7 @@ function CatalogManagement() {
                 ) : (
                   <tr>
                     <td colSpan={canManage ? 5 : 4} className="text-center text-muted">
-                      {loading ? "Dang tai..." : "Chua co trang thai tai san."}
+                      {loading ? "Đang tải..." : "Chưa có trạng thái tài sản."}
                     </td>
                   </tr>
                 )}

@@ -4,7 +4,7 @@ import jakarta.validation.constraints.NotNull;
 
 public class AssignmentActionRequest {
 
-    @NotNull(message = "Nguoi thao tac khong duoc de trong.")
+    @NotNull(message = "Người thao tác không được để trống.")
         private Long actingUserId;
 
         private String note;

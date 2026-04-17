@@ -5,6 +5,13 @@ import StatusBadge from "../../components/common/StatusBadge";
 import { getStoredUser, hasAnyRole } from "../../utils/auth";
 import { formatDateTime, getApiErrorMessage } from "../../utils/format";
 
+const SEVERITY_LABELS = {
+  LOW: "Thấp",
+  MEDIUM: "Trung bình",
+  HIGH: "Cao",
+  CRITICAL: "Nghiêm trọng",
+};
+
 function IncidentManagement() {
   const user = getStoredUser();
   const [incidents, setIncidents] = useState([]);
@@ -50,7 +57,7 @@ function IncidentManagement() {
       setAssets(assetsResponse.data);
       setLookups(lookupsResponse.data);
     } catch (requestError) {
-      setError(getApiErrorMessage(requestError, "Khong tai duoc du lieu su co."));
+      setError(getApiErrorMessage(requestError, "Không tải được dữ liệu sự cố."));
     } finally {
       setLoading(false);
     }
@@ -74,7 +81,7 @@ function IncidentManagement() {
       });
       setCloseForm({ status: "REJECTED", resolutionNote: "" });
     } catch (requestError) {
-      setError(getApiErrorMessage(requestError, "Khong tai duoc chi tiet su co."));
+      setError(getApiErrorMessage(requestError, "Không tải được chi tiết sự cố."));
     }
   };
 
@@ -99,7 +106,7 @@ function IncidentManagement() {
         issueTitle: createForm.issueTitle,
         issueDescription: createForm.issueDescription,
       });
-      setMessage("Da ghi nhan bao hong / su co.");
+      setMessage("Đã ghi nhận báo hỏng hoặc sự cố.");
       setCreateForm({
         assetId: "",
         severity: "MEDIUM",
@@ -108,7 +115,7 @@ function IncidentManagement() {
       });
       fetchData();
     } catch (requestError) {
-      setError(getApiErrorMessage(requestError, "Khong tao duoc bao hong / su co."));
+      setError(getApiErrorMessage(requestError, "Không tạo được báo hỏng hoặc sự cố."));
     }
   };
 
@@ -126,11 +133,11 @@ function IncidentManagement() {
         assignedToUserId: Number(assignForm.assignedToUserId),
         note: assignForm.note,
       });
-      setMessage("Da phan cong xu ly su co.");
+      setMessage("Đã phân công xử lý sự cố.");
       fetchData();
       selectIncident(selectedIncident.incidentReportId);
     } catch (requestError) {
-      setError(getApiErrorMessage(requestError, "Khong the phan cong xu ly."));
+      setError(getApiErrorMessage(requestError, "Không thể phân công xử lý."));
     }
   };
 
@@ -156,11 +163,11 @@ function IncidentManagement() {
           estimatedCost: convertForm.estimatedCost || null,
         }
       );
-      setMessage("Da chuyen su co thanh phieu bao tri.");
+      setMessage("Đã chuyển sự cố thành phiếu bảo trì.");
       fetchData();
       selectIncident(selectedIncident.incidentReportId);
     } catch (requestError) {
-      setError(getApiErrorMessage(requestError, "Khong the chuyen thanh phieu bao tri."));
+      setError(getApiErrorMessage(requestError, "Không thể chuyển thành phiếu bảo trì."));
     }
   };
 
@@ -178,19 +185,19 @@ function IncidentManagement() {
         status: closeForm.status,
         resolutionNote: closeForm.resolutionNote,
       });
-      setMessage("Da cap nhat ket qua xu ly su co.");
+      setMessage("Đã cập nhật kết quả xử lý sự cố.");
       fetchData();
       selectIncident(selectedIncident.incidentReportId);
     } catch (requestError) {
-      setError(getApiErrorMessage(requestError, "Khong the dong / cap nhat su co."));
+      setError(getApiErrorMessage(requestError, "Không thể đóng hoặc cập nhật sự cố."));
     }
   };
 
   return (
     <div className="page-stack">
       <PageHeader
-        title="Bao hong / su co tai san"
-        description="Ghi nhan, phan cong xu ly va chuyen su co sang bao tri khi can."
+        title="Báo hỏng hoặc sự cố tài sản"
+        description="Ghi nhận, phân công xử lý và chuyển sự cố sang bảo trì khi cần."
       />
 
       {message ? <div className="alert alert-success">{message}</div> : null}
@@ -199,13 +206,13 @@ function IncidentManagement() {
       <div className="content-grid">
         <section className="content-card">
           <div className="card-head">
-            <h3>Ghi nhan su co</h3>
-            <p>Tai khoan hien tai co the gui yeu cau ho tro cho tai san gap van de.</p>
+            <h3>Ghi nhận sự cố</h3>
+            <p>Tài khoản hiện tại có thể gửi yêu cầu hỗ trợ cho tài sản gặp vấn đề.</p>
           </div>
 
           <form className="form-grid" onSubmit={handleCreate}>
             <div>
-              <label className="form-label">Tai san</label>
+              <label className="form-label">Tài sản</label>
               <select
                 className="form-select"
                 name="assetId"
@@ -213,7 +220,7 @@ function IncidentManagement() {
                 onChange={handleCreateChange}
                 required
               >
-                <option value="">Chon tai san</option>
+                <option value="">Chọn tài sản</option>
                 {assets.map((asset) => (
                   <option key={asset.assetId} value={asset.assetId}>
                     {asset.assetCode} - {asset.assetName}
@@ -223,22 +230,22 @@ function IncidentManagement() {
             </div>
 
             <div>
-              <label className="form-label">Muc do</label>
+              <label className="form-label">Mức độ</label>
               <select
                 className="form-select"
                 name="severity"
                 value={createForm.severity}
                 onChange={handleCreateChange}
               >
-                <option value="LOW">LOW</option>
-                <option value="MEDIUM">MEDIUM</option>
-                <option value="HIGH">HIGH</option>
-                <option value="CRITICAL">CRITICAL</option>
+                <option value="LOW">Thấp</option>
+                <option value="MEDIUM">Trung bình</option>
+                <option value="HIGH">Cao</option>
+                <option value="CRITICAL">Nghiêm trọng</option>
               </select>
             </div>
 
             <div className="form-grid form-grid--full">
-              <label className="form-label">Tieu de</label>
+              <label className="form-label">Tiêu đề</label>
               <input
                 type="text"
                 className="form-control"
@@ -250,7 +257,7 @@ function IncidentManagement() {
             </div>
 
             <div className="form-grid form-grid--full">
-              <label className="form-label">Mo ta chi tiet</label>
+              <label className="form-label">Mô tả chi tiết</label>
               <textarea
                 className="form-control"
                 rows="4"
@@ -263,7 +270,7 @@ function IncidentManagement() {
 
             <div className="form-actions">
               <button type="submit" className="btn btn-primary">
-                Gui bao hong / su co
+                Gửi báo hỏng hoặc sự cố
               </button>
             </div>
           </form>
@@ -271,19 +278,19 @@ function IncidentManagement() {
 
         <section className="content-card content-card--wide">
           <div className="card-head">
-            <h3>Danh sach su co</h3>
-            <p>Chon 1 su co de xu ly tiep neu tai khoan co quyen.</p>
+            <h3>Danh sách sự cố</h3>
+            <p>Chọn 1 sự cố để xử lý tiếp nếu tài khoản có quyền.</p>
           </div>
 
           <div className="table-responsive">
             <table className="table align-middle custom-table">
               <thead>
                 <tr>
-                  <th>Ma bao cao</th>
-                  <th>Tieu de</th>
-                  <th>Tai san</th>
-                  <th>Muc do</th>
-                  <th>Trang thai</th>
+                  <th>Mã báo cáo</th>
+                  <th>Tiêu đề</th>
+                  <th>Tài sản</th>
+                  <th>Mức độ</th>
+                  <th>Trạng thái</th>
                 </tr>
               </thead>
               <tbody>
@@ -297,14 +304,14 @@ function IncidentManagement() {
                       <td>{incident.reportCode}</td>
                       <td>{incident.issueTitle}</td>
                       <td>{incident.asset?.name}</td>
-                      <td>{incident.severity}</td>
+                      <td>{SEVERITY_LABELS[incident.severity] || incident.severity}</td>
                       <td><StatusBadge status={incident.status} /></td>
                     </tr>
                   ))
                 ) : (
                   <tr>
                     <td colSpan="5" className="text-center text-muted">
-                      {loading ? "Dang tai..." : "Chua co su co nao duoc ghi nhan."}
+                      {loading ? "Đang tải..." : "Chưa có sự cố nào được ghi nhận."}
                     </td>
                   </tr>
                 )}
@@ -316,19 +323,19 @@ function IncidentManagement() {
             <div className="detail-stack mt-4">
               <div className="detail-grid">
                 <div>
-                  <span className="detail-label">Ma bao cao</span>
+                  <span className="detail-label">Mã báo cáo</span>
                   <strong>{selectedIncident.reportCode}</strong>
                 </div>
                 <div>
-                  <span className="detail-label">Tao luc</span>
+                  <span className="detail-label">Tạo lúc</span>
                   <strong>{formatDateTime(selectedIncident.createdAt)}</strong>
                 </div>
                 <div>
-                  <span className="detail-label">Trang thai</span>
+                  <span className="detail-label">Trạng thái</span>
                   <StatusBadge status={selectedIncident.status} />
                 </div>
                 <div>
-                  <span className="detail-label">Nguoi bao cao</span>
+                  <span className="detail-label">Người báo cáo</span>
                   <strong>{selectedIncident.reportedByUser?.fullName}</strong>
                 </div>
               </div>
@@ -337,7 +344,7 @@ function IncidentManagement() {
                 <div className="content-grid">
                   <section className="content-card nested-card">
                     <div className="card-head">
-                      <h3>Phan cong xu ly</h3>
+                      <h3>Phân công xử lý</h3>
                     </div>
                     <div className="form-grid">
                       <select
@@ -350,7 +357,7 @@ function IncidentManagement() {
                           }))
                         }
                       >
-                        <option value="">Chon nguoi xu ly</option>
+                        <option value="">Chọn người xử lý</option>
                         {lookups?.users?.map((item) => (
                           <option key={item.id} value={item.id}>
                             {item.fullName}
@@ -360,7 +367,7 @@ function IncidentManagement() {
                       <textarea
                         className="form-control"
                         rows="3"
-                        placeholder="Ghi chu phan cong"
+                        placeholder="Ghi chú phân công"
                         value={assignForm.note}
                         onChange={(event) =>
                           setAssignForm((current) => ({
@@ -370,14 +377,14 @@ function IncidentManagement() {
                         }
                       />
                       <button type="button" className="btn btn-outline-primary" onClick={handleAssign}>
-                        Phan cong
+                        Phân công
                       </button>
                     </div>
                   </section>
 
                   <section className="content-card nested-card">
                     <div className="card-head">
-                      <h3>Chuyen thanh bao tri</h3>
+                      <h3>Chuyển thành bảo trì</h3>
                     </div>
                     <div className="form-grid">
                       <select
@@ -390,7 +397,7 @@ function IncidentManagement() {
                           }))
                         }
                       >
-                        <option value="">Chon nguoi phu trach</option>
+                        <option value="">Chọn người phụ trách</option>
                         {lookups?.users?.map((item) => (
                           <option key={item.id} value={item.id}>
                             {item.fullName}
@@ -407,10 +414,10 @@ function IncidentManagement() {
                           }))
                         }
                       >
-                        <option value="LOW">LOW</option>
-                        <option value="MEDIUM">MEDIUM</option>
-                        <option value="HIGH">HIGH</option>
-                        <option value="URGENT">URGENT</option>
+                        <option value="LOW">Thấp</option>
+                        <option value="MEDIUM">Trung bình</option>
+                        <option value="HIGH">Cao</option>
+                        <option value="URGENT">Khẩn cấp</option>
                       </select>
                       <select
                         className="form-select"
@@ -422,10 +429,10 @@ function IncidentManagement() {
                           }))
                         }
                       >
-                        <option value="CORRECTIVE">CORRECTIVE</option>
-                        <option value="PREVENTIVE">PREVENTIVE</option>
-                        <option value="INSPECTION">INSPECTION</option>
-                        <option value="OTHER">OTHER</option>
+                        <option value="CORRECTIVE">Khắc phục</option>
+                        <option value="PREVENTIVE">Phòng ngừa</option>
+                        <option value="INSPECTION">Kiểm tra</option>
+                        <option value="OTHER">Khác</option>
                       </select>
                       <textarea
                         className="form-control"
@@ -441,7 +448,7 @@ function IncidentManagement() {
                       <input
                         type="number"
                         className="form-control"
-                        placeholder="Chi phi du kien"
+                        placeholder="Chi phí dự kiến"
                         value={convertForm.estimatedCost}
                         onChange={(event) =>
                           setConvertForm((current) => ({
@@ -451,14 +458,14 @@ function IncidentManagement() {
                         }
                       />
                       <button type="button" className="btn btn-outline-danger" onClick={handleConvert}>
-                        Chuyen sang bao tri
+                        Chuyển sang bảo trì
                       </button>
                     </div>
                   </section>
 
                   <section className="content-card nested-card">
                     <div className="card-head">
-                      <h3>Dong / tu choi yeu cau</h3>
+                      <h3>Đóng hoặc từ chối yêu cầu</h3>
                     </div>
                     <div className="form-grid">
                       <select
@@ -471,14 +478,14 @@ function IncidentManagement() {
                           }))
                         }
                       >
-                        <option value="REJECTED">REJECTED</option>
-                        <option value="CANCELED">CANCELED</option>
-                        <option value="RESOLVED">RESOLVED</option>
+                        <option value="REJECTED">Từ chối</option>
+                        <option value="CANCELED">Đã hủy</option>
+                        <option value="RESOLVED">Đã xử lý</option>
                       </select>
                       <textarea
                         className="form-control"
                         rows="3"
-                        placeholder="Mo ta ket qua xu ly"
+                        placeholder="Mô tả kết quả xử lý"
                         value={closeForm.resolutionNote}
                         onChange={(event) =>
                           setCloseForm((current) => ({
@@ -488,7 +495,7 @@ function IncidentManagement() {
                         }
                       />
                       <button type="button" className="btn btn-outline-secondary" onClick={handleClose}>
-                        Cap nhat trang thai
+                        Cập nhật trạng thái
                       </button>
                     </div>
                   </section>
