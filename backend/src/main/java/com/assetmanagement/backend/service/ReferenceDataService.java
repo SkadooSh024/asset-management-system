@@ -1,0 +1,142 @@
+package com.assetmanagement.backend.service;
+
+import java.util.List;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.assetmanagement.backend.dto.LookupBundleResponse;
+import com.assetmanagement.backend.dto.ReferenceResponse;
+import com.assetmanagement.backend.dto.UserReferenceResponse;
+import com.assetmanagement.backend.entity.Asset;
+import com.assetmanagement.backend.entity.AssetCategory;
+import com.assetmanagement.backend.entity.AssetStatus;
+import com.assetmanagement.backend.entity.Department;
+import com.assetmanagement.backend.entity.IncidentReport;
+import com.assetmanagement.backend.entity.User;
+import com.assetmanagement.backend.exception.BusinessException;
+import com.assetmanagement.backend.repository.AssetCategoryRepository;
+import com.assetmanagement.backend.repository.AssetRepository;
+import com.assetmanagement.backend.repository.AssetStatusRepository;
+import com.assetmanagement.backend.repository.DepartmentRepository;
+import com.assetmanagement.backend.repository.IncidentReportRepository;
+import com.assetmanagement.backend.repository.UserRepository;
+import com.assetmanagement.backend.util.ResponseMapper;
+import com.assetmanagement.backend.util.SystemCodes;
+
+@Service
+@Transactional(readOnly = true)
+public class ReferenceDataService {
+
+    private final DepartmentRepository departmentRepository;
+    private final UserRepository userRepository;
+    private final AssetCategoryRepository assetCategoryRepository;
+    private final AssetStatusRepository assetStatusRepository;
+    private final AssetRepository assetRepository;
+    private final IncidentReportRepository incidentReportRepository;
+
+    public ReferenceDataService(
+        DepartmentRepository departmentRepository,
+        UserRepository userRepository,
+        AssetCategoryRepository assetCategoryRepository,
+        AssetStatusRepository assetStatusRepository,
+        AssetRepository assetRepository,
+        IncidentReportRepository incidentReportRepository
+    ) {
+        this.departmentRepository = departmentRepository;
+        this.userRepository = userRepository;
+        this.assetCategoryRepository = assetCategoryRepository;
+        this.assetStatusRepository = assetStatusRepository;
+        this.assetRepository = assetRepository;
+        this.incidentReportRepository = incidentReportRepository;
+    }
+
+    public LookupBundleResponse getLookupBundle() {
+        List<ReferenceResponse> departments = departmentRepository.findAllByIsActiveTrueOrderByDepartmentNameAsc()
+            .stream()
+            .map(ResponseMapper::toReference)
+            .toList();
+
+        List<UserReferenceResponse> users = userRepository.findAllByStatusOrderByFullNameAsc(SystemCodes.USER_STATUS_ACTIVE)
+            .stream()
+            .map(ResponseMapper::toUserReference)
+            .toList();
+
+        List<ReferenceResponse> categories = assetCategoryRepository.findAllByOrderByCategoryNameAsc()
+            .stream()
+            .map(ResponseMapper::toReference)
+            .toList();
+
+        List<ReferenceResponse> statuses = assetStatusRepository.findAllByOrderBySortOrderAscStatusNameAsc()
+            .stream()
+            .map(ResponseMapper::toReference)
+            .toList();
+
+        return LookupBundleResponse.builder()
+            .departments(departments)
+            .users(users)
+            .assetCategories(categories)
+            .assetStatuses(statuses)
+            .build();
+    }
+
+    public User requireUser(Long userId) {
+        return userRepository.findById(userId)
+            .orElseThrow(() -> new BusinessException(HttpStatus.NOT_FOUND, "Khong tim thay nguoi dung."));
+    }
+
+    public User getUserOrNull(Long userId) {
+        if (userId == null) {
+            return null;
+        }
+        return requireUser(userId);
+    }
+
+    public Department getDepartmentOrNull(Long departmentId) {
+        if (departmentId == null) {
+            return null;
+        }
+        return departmentRepository.findById(departmentId)
+            .orElseThrow(() -> new BusinessException(HttpStatus.NOT_FOUND, "Khong tim thay phong ban."));
+    }
+
+    public AssetCategory requireCategory(Long categoryId) {
+        return assetCategoryRepository.findById(categoryId)
+            .orElseThrow(() -> new BusinessException(HttpStatus.NOT_FOUND, "Khong tim thay danh muc tai san."));
+    }
+
+    public AssetCategory getCategoryOrNull(Long categoryId) {
+        if (categoryId == null) {
+            return null;
+        }
+        return requireCategory(categoryId);
+    }
+
+    public AssetStatus requireAssetStatus(Long statusId) {
+        return assetStatusRepository.findById(statusId)
+            .orElseThrow(() -> new BusinessException(HttpStatus.NOT_FOUND, "Khong tim thay trang thai tai san."));
+    }
+
+    public AssetStatus getAssetStatusOrNull(Long statusId) {
+        if (statusId == null) {
+            return null;
+        }
+        return requireAssetStatus(statusId);
+    }
+
+    public AssetStatus requireAssetStatusByCode(String statusCode) {
+        return assetStatusRepository.findByStatusCode(statusCode)
+            .orElseThrow(() -> new BusinessException(HttpStatus.NOT_FOUND, "Khong tim thay trang thai tai san " + statusCode + "."));
+    }
+
+    public Asset requireAsset(Long assetId) {
+        return assetRepository.findById(assetId)
+            .orElseThrow(() -> new BusinessException(HttpStatus.NOT_FOUND, "Khong tim thay tai san."));
+    }
+
+    public IncidentReport requireIncident(Long incidentReportId) {
+        return incidentReportRepository.findById(incidentReportId)
+            .orElseThrow(() -> new BusinessException(HttpStatus.NOT_FOUND, "Khong tim thay bao hong / su co."));
+    }
+}

@@ -1,53 +1,35 @@
 package com.assetmanagement.backend.controller;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.assetmanagement.backend.dto.LoginRequest;
-import com.assetmanagement.backend.entity.User;
-import com.assetmanagement.backend.repository.UserRepository;
+import com.assetmanagement.backend.dto.LoginResponse;
+import com.assetmanagement.backend.dto.LogoutRequest;
+import com.assetmanagement.backend.dto.SimpleMessageResponse;
+import com.assetmanagement.backend.service.AuthService;
+
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
 
-    private final UserRepository userRepository;
+    private final AuthService authService;
 
-    public AuthController(UserRepository userRepository) {
-        this.userRepository = userRepository;
+    public AuthController(AuthService authService) {
+        this.authService = authService;
     }
 
     @PostMapping("/login")
-    public Map<String, Object> login(@RequestBody LoginRequest request) {
-        Map<String, Object> response = new HashMap<>();
+    public LoginResponse login(@Valid @RequestBody LoginRequest request) {
+        return authService.login(request);
+    }
 
-        Optional<User> userOpt = userRepository.findByUsername(request.getUsername());
-
-        if (userOpt.isEmpty()) {
-            response.put("success", false);
-            response.put("message", "Sai tài khoản hoặc mật khẩu");
-            return response;
-        }
-
-        User user = userOpt.get();
-
-        response.put("success", true);
-        response.put("message", "Đăng nhập thành công");
-        response.put("user", Map.of(
-            "userId", user.getUserId(),
-            "username", user.getUsername(),
-            "fullName", user.getFullName(),
-            "email", user.getEmail(),
-            "status", user.getStatus()
-        ));
-
-        return response;
+    @PostMapping("/logout")
+    public SimpleMessageResponse logout(@Valid @RequestBody LogoutRequest request) {
+        return authService.logout(request);
     }
 }
