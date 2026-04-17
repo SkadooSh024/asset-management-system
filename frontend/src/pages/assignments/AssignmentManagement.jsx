@@ -61,12 +61,52 @@ function AssignmentManagement() {
     (asset) => asset.isActive && asset.currentStatus?.code === "READY"
   );
 
+  const selectedAssets = availableAssets.filter((asset) => form.assetIds.includes(asset.assetId));
+  const selectedSourceDepartments = selectedAssets.reduce((departments, asset) => {
+    const sourceDepartment = asset.currentDepartment || asset.owningDepartment;
+    if (!sourceDepartment) {
+      return departments;
+    }
+
+    if (!departments.some((item) => item.id === sourceDepartment.id)) {
+      departments.push(sourceDepartment);
+    }
+
+    return departments;
+  }, []);
+
+  const derivedSourceDepartmentId =
+    selectedSourceDepartments.length === 1 ? String(selectedSourceDepartments[0].id) : "";
+  const derivedSourceDepartmentLabel =
+    selectedAssets.length === 0
+      ? "Chọn tài sản để hệ thống tự suy ra"
+      : selectedSourceDepartments.length === 0
+        ? "Không xác định từ dữ liệu hiện tại"
+        : selectedSourceDepartments.length === 1
+          ? selectedSourceDepartments[0].name
+          : "Nhiều phòng ban nguồn";
+
+  const filteredUsers = (lookups?.users || []).filter((item) =>
+    form.targetDepartmentId ? String(item.departmentId) === form.targetDepartmentId : false
+  );
+
   const handleChange = (event) => {
     const { name, value } = event.target;
-    setForm((current) => ({
-      ...current,
-      [name]: value,
-    }));
+    setForm((current) => {
+      if (name === "targetDepartmentId") {
+        return {
+          ...current,
+          targetDepartmentId: value,
+          targetUserId:
+            value && String(current.targetDepartmentId) === value ? current.targetUserId : "",
+        };
+      }
+
+      return {
+        ...current,
+        [name]: value,
+      };
+    });
   };
 
   const toggleAsset = (assetId) => {
@@ -83,13 +123,23 @@ function AssignmentManagement() {
     setMessage("");
     setError("");
 
+    if (!form.targetDepartmentId) {
+      setError("Vui lòng chọn phòng ban nhận.");
+      return;
+    }
+
+    if (!form.assetIds.length) {
+      setError("Vui lòng chọn ít nhất 1 tài sản để cấp phát.");
+      return;
+    }
+
     try {
       await axiosClient.post("/api/assignments", {
         actingUserId: user.userId,
         assignmentDate: form.assignmentDate,
-        sourceDepartmentId: form.sourceDepartmentId || null,
-        targetDepartmentId: form.targetDepartmentId || null,
-        targetUserId: form.targetUserId || null,
+        sourceDepartmentId: derivedSourceDepartmentId || null,
+        targetDepartmentId: Number(form.targetDepartmentId),
+        targetUserId: form.targetUserId ? Number(form.targetUserId) : null,
         reason: form.reason,
         note: form.note,
         details: form.assetIds.map((assetId) => ({
@@ -174,20 +224,14 @@ function AssignmentManagement() {
 
             <div>
               <label className="form-label">Phòng ban nguồn</label>
-              <select
-                className="form-select"
+              <input
+                type="text"
+                className="form-control"
                 name="sourceDepartmentId"
-                value={form.sourceDepartmentId}
-                onChange={handleChange}
-                disabled={!canCreate}
-              >
-                <option value="">Không bắt buộc</option>
-                {lookups?.departments?.map((item) => (
-                  <option key={item.id} value={item.id}>
-                    {item.name}
-                  </option>
-                ))}
-              </select>
+                value={derivedSourceDepartmentLabel}
+                disabled
+              />
+              <small className="form-helper">Hệ thống tự suy ra từ tài sản đã chọn.</small>
             </div>
 
             <div>
@@ -198,14 +242,16 @@ function AssignmentManagement() {
                 value={form.targetDepartmentId}
                 onChange={handleChange}
                 disabled={!canCreate}
+                required
               >
-                <option value="">Không bắt buộc</option>
+                <option value="">Bắt buộc chọn</option>
                 {lookups?.departments?.map((item) => (
                   <option key={item.id} value={item.id}>
                     {item.name}
                   </option>
                 ))}
               </select>
+              <small className="form-helper">Chọn phòng ban trước để lọc người nhận cho dễ.</small>
             </div>
 
             <div>
@@ -215,15 +261,22 @@ function AssignmentManagement() {
                 name="targetUserId"
                 value={form.targetUserId}
                 onChange={handleChange}
-                disabled={!canCreate}
+                disabled={!canCreate || !form.targetDepartmentId}
               >
-                <option value="">Không bắt buộc</option>
-                {lookups?.users?.map((item) => (
+                <option value="">
+                  {form.targetDepartmentId
+                    ? "Chọn người nhận trong phòng ban"
+                    : "Chọn phòng ban nhận trước"}
+                </option>
+                {filteredUsers.map((item) => (
                   <option key={item.id} value={item.id}>
                     {item.fullName} - {item.departmentName || "Không có phòng ban"}
                   </option>
                 ))}
               </select>
+              <small className="form-helper">
+                Có thể để trống nếu cấp phát cho phòng ban dùng chung, không giao đích danh cho cá nhân.
+              </small>
             </div>
 
             <div className="form-grid form-grid--full">

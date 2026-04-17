@@ -102,6 +102,14 @@ textarea.form-control {
   font-weight: 600;
 }
 
+.form-helper {
+  display: block;
+  margin-top: 0.38rem;
+  color: var(--text-muted);
+  font-size: 0.84rem;
+  line-height: 1.45;
+}
+
 .btn {
   border-radius: 14px;
   padding: 0.72rem 1.2rem;

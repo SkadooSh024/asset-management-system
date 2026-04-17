@@ -5,6 +5,8 @@ public class UserReferenceResponse {
 
     private Long id;
 
+        private Long departmentId;
+
         private String username;
 
         private String fullName;
@@ -16,8 +18,9 @@ public class UserReferenceResponse {
     public UserReferenceResponse() {
         }
 
-    public UserReferenceResponse(Long id, String username, String fullName, String roleCode, String departmentName) {
+    public UserReferenceResponse(Long id, Long departmentId, String username, String fullName, String roleCode, String departmentName) {
             this.id = id;
+            this.departmentId = departmentId;
             this.username = username;
             this.fullName = fullName;
             this.roleCode = roleCode;
@@ -30,6 +33,14 @@ public class UserReferenceResponse {
 
     public void setId(Long id) {
             this.id = id;
+        }
+
+    public Long getDepartmentId() {
+            return departmentId;
+        }
+
+    public void setDepartmentId(Long departmentId) {
+            this.departmentId = departmentId;
         }
 
     public String getUsername() {
@@ -70,6 +81,7 @@ public class UserReferenceResponse {
 
     public static class UserReferenceResponseBuilder {
             private Long id;
+            private Long departmentId;
             private String username;
             private String fullName;
             private String roleCode;
@@ -77,6 +89,11 @@ public class UserReferenceResponse {
 
             public UserReferenceResponseBuilder id(Long id) {
                 this.id = id;
+                return this;
+            }
+
+            public UserReferenceResponseBuilder departmentId(Long departmentId) {
+                this.departmentId = departmentId;
                 return this;
             }
 
@@ -101,7 +118,7 @@ public class UserReferenceResponse {
             }
 
             public UserReferenceResponse build() {
-                return new UserReferenceResponse(id, username, fullName, roleCode, departmentName);
+                return new UserReferenceResponse(id, departmentId, username, fullName, roleCode, departmentName);
             }
         }
 }

@@ -64,16 +64,27 @@ public class AssignmentService {
             request.getActingUserId(),
             SystemCodes.ROLE_ASSET_STAFF
         );
-        Department targetDepartment = referenceDataService.getDepartmentOrNull(request.getTargetDepartmentId());
         User targetUser = referenceDataService.getUserOrNull(request.getTargetUserId());
-        if (targetDepartment == null && targetUser == null) {
-            throw new BusinessException(HttpStatus.BAD_REQUEST, "Phiếu cấp phát phải có phòng ban nhận hoặc người nhận.");
+        Department targetDepartment = referenceDataService.getDepartmentOrNull(request.getTargetDepartmentId());
+
+        if (targetUser != null) {
+            if (targetUser.getDepartment() == null) {
+                throw new BusinessException(HttpStatus.BAD_REQUEST, "Người nhận chưa được gán phòng ban.");
+            }
+            if (targetDepartment == null) {
+                targetDepartment = targetUser.getDepartment();
+            } else if (!targetDepartment.getDepartmentId().equals(targetUser.getDepartment().getDepartmentId())) {
+                throw new BusinessException(HttpStatus.BAD_REQUEST, "Người nhận phải thuộc đúng phòng ban nhận đã chọn.");
+            }
+        }
+
+        if (targetDepartment == null) {
+            throw new BusinessException(HttpStatus.BAD_REQUEST, "Phiếu cấp phát phải có phòng ban nhận.");
         }
 
         AssignmentForm form = new AssignmentForm();
         form.setFormCode(CodeGeneratorUtil.generateFormCode("ASF"));
         form.setAssignmentDate(request.getAssignmentDate());
-        form.setSourceDepartment(referenceDataService.getDepartmentOrNull(request.getSourceDepartmentId()));
         form.setTargetDepartment(targetDepartment);
         form.setTargetUser(targetUser);
         form.setIssuedByUser(actingUser);
@@ -84,6 +95,8 @@ public class AssignmentService {
         form.setUpdatedBy(actingUser);
 
         Set<Long> uniqueAssetIds = new HashSet<>();
+        Set<Long> sourceDepartmentIds = new HashSet<>();
+        Department inferredSourceDepartment = null;
         List<AssignmentFormDetail> details = request.getDetails()
             .stream()
             .map(item -> {
@@ -94,6 +107,13 @@ public class AssignmentService {
                 Asset asset = referenceDataService.requireAsset(item.getAssetId());
                 validateAssignableAsset(asset);
 
+                Department sourceDepartment = asset.getCurrentDepartment() != null
+                    ? asset.getCurrentDepartment()
+                    : asset.getOwningDepartment();
+                if (sourceDepartment != null) {
+                    sourceDepartmentIds.add(sourceDepartment.getDepartmentId());
+                }
+
                 AssignmentFormDetail detail = new AssignmentFormDetail();
                 detail.setAssignmentForm(form);
                 detail.setAsset(asset);
@@ -103,6 +123,16 @@ public class AssignmentService {
             })
             .toList();
 
+        if (request.getSourceDepartmentId() != null) {
+            inferredSourceDepartment = referenceDataService.getDepartmentOrNull(request.getSourceDepartmentId());
+        } else if (sourceDepartmentIds.size() == 1) {
+            Asset firstAsset = details.getFirst().getAsset();
+            inferredSourceDepartment = firstAsset.getCurrentDepartment() != null
+                ? firstAsset.getCurrentDepartment()
+                : firstAsset.getOwningDepartment();
+        }
+
+        form.setSourceDepartment(inferredSourceDepartment);
         form.getDetails().clear();
         form.getDetails().addAll(details);
         return ResponseMapper.toAssignmentResponse(assignmentFormRepository.save(form));

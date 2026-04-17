@@ -81,6 +81,7 @@ public final class ResponseMapper {
         }
         return UserReferenceResponse.builder()
             .id(user.getUserId())
+            .departmentId(user.getDepartment() != null ? user.getDepartment().getDepartmentId() : null)
             .username(user.getUsername())
             .fullName(user.getFullName())
             .roleCode(user.getRole() != null ? user.getRole().getRoleCode() : null)
