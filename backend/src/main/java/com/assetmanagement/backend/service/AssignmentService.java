@@ -126,7 +126,7 @@ public class AssignmentService {
         if (request.getSourceDepartmentId() != null) {
             inferredSourceDepartment = referenceDataService.getDepartmentOrNull(request.getSourceDepartmentId());
         } else if (sourceDepartmentIds.size() == 1) {
-            Asset firstAsset = details.getFirst().getAsset();
+            Asset firstAsset = details.get(0).getAsset();
             inferredSourceDepartment = firstAsset.getCurrentDepartment() != null
                 ? firstAsset.getCurrentDepartment()
                 : firstAsset.getOwningDepartment();
