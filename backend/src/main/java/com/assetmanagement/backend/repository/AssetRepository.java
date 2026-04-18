@@ -13,6 +13,10 @@ public interface AssetRepository extends JpaRepository<Asset, Long> {
 
     Optional<Asset> findByAssetCode(String assetCode);
 
+    Optional<Asset> findBySerialNumber(String serialNumber);
+
+    Optional<Asset> findByAssetTag(String assetTag);
+
     long countByIsActiveTrue();
 
     long countByCurrentStatus_StatusCode(String statusCode);

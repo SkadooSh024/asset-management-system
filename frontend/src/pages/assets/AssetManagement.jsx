@@ -315,7 +315,7 @@ function AssetManagement() {
         <section className="content-card">
           <div className="card-head">
             <h3>{editingAssetId ? "Cập nhật tài sản" : "Thêm tài sản"}</h3>
-            <p>{canManage ? "Lưu ý: mã tài sản phải duy nhất." : "Tài khoản này chỉ có quyền xem."}</p>
+            <p>{canManage ? "Lưu ý: mã tài sản, số serial và mã thẻ tài sản không được trùng." : "Tài khoản này chỉ có quyền xem."}</p>
           </div>
 
           <form className="form-grid" onSubmit={handleSubmit}>

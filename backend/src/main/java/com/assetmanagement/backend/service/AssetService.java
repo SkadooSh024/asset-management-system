@@ -56,6 +56,8 @@ public class AssetService {
     @Transactional
     public AssetResponse createAsset(AssetRequest request) {
         validateAssetCode(request.getAssetCode(), null);
+        validateSerialNumber(request.getSerialNumber(), null);
+        validateAssetTag(request.getAssetTag(), null);
 
         User actingUser = referenceDataService.requireUserWithRoles(
             request.getActingUserId(),
@@ -88,6 +90,8 @@ public class AssetService {
     public AssetResponse updateAsset(Long assetId, AssetRequest request) {
         Asset asset = referenceDataService.requireAsset(assetId);
         validateAssetCode(request.getAssetCode(), assetId);
+        validateSerialNumber(request.getSerialNumber(), assetId);
+        validateAssetTag(request.getAssetTag(), assetId);
 
         User actingUser = referenceDataService.requireUserWithRoles(
             request.getActingUserId(),
@@ -175,8 +179,8 @@ public class AssetService {
         asset.setAssignedUser(referenceDataService.getUserOrNull(request.getAssignedUserId()));
         asset.setBrand(request.getBrand());
         asset.setModel(request.getModel());
-        asset.setSerialNumber(request.getSerialNumber());
-        asset.setAssetTag(request.getAssetTag());
+        asset.setSerialNumber(normalizeNullableText(request.getSerialNumber()));
+        asset.setAssetTag(normalizeNullableText(request.getAssetTag()));
         asset.setPurchaseDate(request.getPurchaseDate());
         asset.setWarrantyExpiryDate(request.getWarrantyExpiryDate());
         asset.setPurchaseCost(request.getPurchaseCost());
@@ -207,5 +211,31 @@ public class AssetService {
             .ifPresent(existing -> {
                 throw new BusinessException(HttpStatus.CONFLICT, "Mã tài sản đã tồn tại.");
             });
+    }
+
+    private void validateSerialNumber(String serialNumber, Long currentAssetId) {
+        if (!StringUtils.hasText(serialNumber)) {
+            return;
+        }
+        assetRepository.findBySerialNumber(serialNumber.trim())
+            .filter(existing -> !existing.getAssetId().equals(currentAssetId))
+            .ifPresent(existing -> {
+                throw new BusinessException(HttpStatus.CONFLICT, "Số serial đã tồn tại.");
+            });
+    }
+
+    private void validateAssetTag(String assetTag, Long currentAssetId) {
+        if (!StringUtils.hasText(assetTag)) {
+            return;
+        }
+        assetRepository.findByAssetTag(assetTag.trim())
+            .filter(existing -> !existing.getAssetId().equals(currentAssetId))
+            .ifPresent(existing -> {
+                throw new BusinessException(HttpStatus.CONFLICT, "Mã thẻ tài sản đã tồn tại.");
+            });
+    }
+
+    private String normalizeNullableText(String value) {
+        return StringUtils.hasText(value) ? value.trim() : null;
     }
 }
